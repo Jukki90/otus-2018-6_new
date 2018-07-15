@@ -17,6 +17,8 @@
         <maven.compiler.target>1.10</maven.compiler.target>
         <guava.version>25.1-jre</guava.version>
         <jdk.version>10</jdk.version>
+        <proguard.maven.plugin.version>2.0.14</proguard.maven.plugin.version>
+        <proguard.version>6.0.3</proguard.version>
     </properties>
 
     <dependencies>
@@ -62,6 +64,41 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.github.wvengen</groupId>
+                <artifactId>proguard-maven-plugin</artifactId>
+                <version>${proguard.maven.plugin.version}</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>net.sf.proguard</groupId>
+                        <artifactId>proguard-base</artifactId>
+                        <version>${proguard.version}</version>
+                    </dependency>
+                </dependencies>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>proguard</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <proguardVersion>${proguard.version}</proguardVersion>
+                    <obfuscate>true</obfuscate>
+                    <injar>${project.name}-${user.name}.jar</injar>
+                    <outFilter>${project.name}-small.jar</outFilter>
+                    <outputDirectory>${project.build.directory}</outputDirectory>
+                    <options>
+                        <option>-keep public class lesson1.Main{public static void main(java.lang.String[]);}</option>
+                        <option>-dontwarn</option>
+                    </options>
+                    <libs>
+                        <lib>${java.home}/jmods/java.base.jmod</lib>
+                    </libs>
+                </configuration>
+
             </plugin>
         </plugins>
     </build>
