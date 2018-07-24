@@ -14,7 +14,7 @@ class MyArrayList<T> implements List<T> {
     public MyArrayList(int initSize) {
         if (initSize > 0) {
             this.items = new Object[initSize];
-            size=initSize;
+            size = initSize;
         } else {
             throw new IllegalArgumentException("Длина списка должна быть больше 0!");
         }
@@ -86,8 +86,8 @@ class MyArrayList<T> implements List<T> {
                     size + 1);
             size = size + 1;
             current++;
-            newArr[size-1] = t;
-            items=newArr;
+            newArr[size - 1] = t;
+            items = newArr;
         }
         return true;
     }
@@ -118,7 +118,7 @@ class MyArrayList<T> implements List<T> {
             System.arraycopy(items, 0, newItems, 0, size);
             System.arraycopy(operand, 0, newItems, size, operand.length);
             items = newItems;
-            size = size+c.size();
+            size = size + c.size();
 
         }
         return true;
@@ -135,7 +135,6 @@ class MyArrayList<T> implements List<T> {
 
         return false;
     }
-
 
 
     public boolean removeAll(Collection<?> c) {
@@ -182,7 +181,7 @@ class MyArrayList<T> implements List<T> {
     }
 
     public ListIterator<T> listIterator() {
-        return null;
+        return new ListIter();
     }
 
     public ListIterator<T> listIterator(int index) {
@@ -191,6 +190,55 @@ class MyArrayList<T> implements List<T> {
 
     public List<T> subList(int fromIndex, int toIndex) {
         return null;
+    }
+
+    private class ListIter implements ListIterator<T> {
+        int cursor = 0;
+
+        @Override
+        public boolean hasNext() {
+            return cursor < items.length;
+        }
+
+        @Override
+        public T next() {
+            return (T) items[cursor++];
+        }
+
+        @Override
+        public boolean hasPrevious() {
+            return cursor > 1;
+        }
+
+        @Override
+        public T previous() {
+            return (T) items[cursor--];
+        }
+
+        @Override
+        public int nextIndex() {
+            return cursor++;
+        }
+
+        @Override
+        public int previousIndex() {
+            return cursor--;
+        }
+
+        @Override
+        public void remove() {
+
+        }
+
+        @Override
+        public void set(T t) {
+            items[cursor - 1] = t;
+        }
+
+        @Override
+        public void add(T t) {
+
+        }
     }
 
 
@@ -207,4 +255,6 @@ class MyArrayList<T> implements List<T> {
     public void sort(Comparator<? super T> c) {
         Arrays.sort((T[]) items, 0, size, c);
     }
+
+
 }
