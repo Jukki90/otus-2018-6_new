@@ -1,10 +1,8 @@
 import java.util.*;
-import java.util.function.Consumer;
 
 class MyArrayList<T> implements List<T> {
     private static final int DEFAULT_SIZE = 10;
     private int size = 0;
-    private int current = 0;
     private Object[] items;
 
     public MyArrayList() {
@@ -25,7 +23,7 @@ class MyArrayList<T> implements List<T> {
     }
 
     public boolean isEmpty() {
-        return size == 0 ? true : false;
+        return size == 0;
     }
 
     public boolean contains(Object o) {
@@ -37,55 +35,27 @@ class MyArrayList<T> implements List<T> {
         return false;
     }
 
+    @Override
     public Iterator<T> iterator() {
-        return new Iter();
+        throw new UnsupportedOperationException("This method is not realized");
     }
 
-
-    private class Iter implements Iterator<T> {
-        int cursor;
-
-        public boolean hasNext() {
-            return cursor < size;
-        }
-
-        public T next() {
-            if (cursor <= items.length) {
-                return (T) items[cursor++];
-            } else {
-                throw new IndexOutOfBoundsException();
-            }
-        }
-
-        public void remove() {
-            for (int i = cursor; i < items.length; i++) {
-                items[i] = items[i + 1];
-                size--;
-            }
-        }
-
-        public void forEachRemaining(Consumer<? super T> action) {
-
-        }
-    }
 
     public Object[] toArray() {
         return Arrays.copyOf(items, size);
     }
 
     public <T1> T1[] toArray(T1[] a) {
-        return null;
+        throw new UnsupportedOperationException("This method is not realized");
     }
 
     public boolean add(T t) {
-        if (current < size) {
-            items[current] = t;
-            current++;
+        if (items.length < size - 1) {
+            items[items.length] = t;
         } else {
             Object[] newArr = Arrays.copyOf(items,
                     size + 1);
             size = size + 1;
-            current++;
             newArr[size - 1] = t;
             items = newArr;
         }
@@ -95,11 +65,8 @@ class MyArrayList<T> implements List<T> {
     public boolean remove(Object o) {
         for (int i = 0; i < size; i++) {
             if (items[i].equals(o)) {
-                current = i;
                 {
-                    for (int j = i; j < size; j++) {
-                        items[j] = items[j + 1];
-                    }
+                    System.arraycopy(items, i + 1, items, i, size - i);
                     size = size - 1;
                 }
             }
@@ -108,7 +75,7 @@ class MyArrayList<T> implements List<T> {
     }
 
     public boolean containsAll(Collection<?> c) {
-        return false;
+        throw new UnsupportedOperationException("This method is not realized");
     }
 
     public boolean addAll(Collection<? extends T> c) {
@@ -119,7 +86,6 @@ class MyArrayList<T> implements List<T> {
             System.arraycopy(operand, 0, newItems, size, operand.length);
             items = newItems;
             size = size + c.size();
-
         }
         return true;
     }
@@ -132,8 +98,7 @@ class MyArrayList<T> implements List<T> {
         }
         Object[] operand = c.toArray();
         System.arraycopy(operand, index, items, items.length, operand.length);
-
-        return false;
+        return true;
     }
 
 
@@ -144,7 +109,7 @@ class MyArrayList<T> implements List<T> {
     }
 
     public boolean retainAll(Collection<?> c) {
-        return false;
+        throw new UnsupportedOperationException("This method is not realized");
     }
 
     public void clear() {
@@ -165,19 +130,19 @@ class MyArrayList<T> implements List<T> {
     }
 
     public void add(int index, T element) {
-
+        throw new UnsupportedOperationException("This method is not realized");
     }
 
     public T remove(int index) {
-        return null;
+        throw new UnsupportedOperationException("This method is not realized");
     }
 
     public int indexOf(Object o) {
-        return 0;
+        throw new UnsupportedOperationException("This method is not realized");
     }
 
     public int lastIndexOf(Object o) {
-        return 0;
+        throw new UnsupportedOperationException("This method is not realized");
     }
 
     public ListIterator<T> listIterator() {
@@ -185,11 +150,11 @@ class MyArrayList<T> implements List<T> {
     }
 
     public ListIterator<T> listIterator(int index) {
-        return null;
+        throw new UnsupportedOperationException("This method is not realized");
     }
 
     public List<T> subList(int fromIndex, int toIndex) {
-        return null;
+        throw new UnsupportedOperationException("This method is not realized");
     }
 
     private class ListIter implements ListIterator<T> {
@@ -227,7 +192,7 @@ class MyArrayList<T> implements List<T> {
 
         @Override
         public void remove() {
-
+            throw new UnsupportedOperationException("This method is not realized");
         }
 
         @Override
@@ -237,7 +202,7 @@ class MyArrayList<T> implements List<T> {
 
         @Override
         public void add(T t) {
-
+            throw new UnsupportedOperationException("This method is not realized");
         }
     }
 
@@ -245,7 +210,7 @@ class MyArrayList<T> implements List<T> {
     public String toString() {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < items.length; i++) {
-            builder.append(i + ":" + items[i] + ",");
+            builder.append(i).append(":").append(items[i]).append(",");
         }
         return builder.toString();
     }
@@ -255,6 +220,4 @@ class MyArrayList<T> implements List<T> {
     public void sort(Comparator<? super T> c) {
         Arrays.sort((T[]) items, 0, size, c);
     }
-
-
 }
