@@ -27,6 +27,7 @@ public class Benchmark implements BenchmarkMBean {
             if ((System.currentTimeMillis() - timer) > period) {
                 statistics.printResult();
                 statistics.reset();
+;
                 timer = System.currentTimeMillis();
             }
         }

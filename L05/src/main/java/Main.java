@@ -18,7 +18,6 @@ import java.util.List;
 -XX:HeapDumpPath=.
 -XX:+UseG1GC
 -Xdebug
--XX:+PrintGCDetails
  */
 
 public class Main {
