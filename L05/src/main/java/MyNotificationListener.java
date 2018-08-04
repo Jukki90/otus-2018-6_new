@@ -5,7 +5,7 @@ import javax.management.NotificationListener;
 import javax.management.openmbean.CompositeData;
 
 public class MyNotificationListener implements NotificationListener {
-    private Statistics statistics= Statistics.getInstance();
+    private Statistics statistics = Statistics.getInstance();
 
     @Override
     public void handleNotification(Notification notification, Object handback) {
@@ -21,6 +21,7 @@ public class MyNotificationListener implements NotificationListener {
                     builder.append("Old Gen GC: ");
                     statistics.addOld(gcInfo.getGcInfo().getDuration());
                 }
+                statistics.incNumberOfAssemblies();
                 builder.append(":").append(" start ").append(gcInfo.getGcInfo().getStartTime()).append(", duration: ").append(gcInfo.getGcInfo().getDuration());
                 System.out.println(builder.toString());
             }

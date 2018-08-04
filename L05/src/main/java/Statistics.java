@@ -4,6 +4,7 @@ public class Statistics {
     private long youngSummary;
     private long oldSummary;
     private long startTime;
+    private long numberOfAssemblies;
     private static Statistics instance = new Statistics();
 
     public static synchronized Statistics getInstance() {
@@ -18,6 +19,7 @@ public class Statistics {
         oldPerPeriod = 0;
         youngSummary = 0;
         oldSummary = 0;
+        numberOfAssemblies = 0;
         startTime = System.currentTimeMillis();
     }
 
@@ -27,6 +29,9 @@ public class Statistics {
         oldPerPeriod = 0;
     }
 
+    public void incNumberOfAssemblies() {
+        numberOfAssemblies++;
+    }
 
     public void addYoung(long value) {
         this.youngSummary += value;
@@ -46,5 +51,6 @@ public class Statistics {
         System.out.println("Old gen per minute = " + oldPerPeriod + "ms");
         System.out.println("Young gen summary = " + youngSummary + "ms");
         System.out.println("Old gen summary = " + oldSummary + "ms");
+        System.out.println("Кол-во сборок GC = " + numberOfAssemblies);
     }
 }
