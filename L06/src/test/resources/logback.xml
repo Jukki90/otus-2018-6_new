@@ -21,11 +21,11 @@
         </encoder>
     </appender>
 
-    <logger name="Main" level="info" additivity="true">
+    <logger name="cache.CacheTest" level="info" additivity="true">
         <appender-ref ref="APP_LOG"/>
     </logger>
 
     <root level="DEBUG">
-        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="APP_LOG"/>
     </root>
 </configuration>

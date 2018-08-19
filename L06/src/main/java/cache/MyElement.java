@@ -1,6 +1,6 @@
 package cache;
 
-public class MyElement<K, V>  {
+public class MyElement<K, V> {
     private final K key;
     private final V value;
     private final long creationTime;
