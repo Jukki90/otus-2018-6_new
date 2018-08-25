@@ -15,10 +15,6 @@
         </encoder>
     </appender>
 
-    <logger name="cache.CacheTest" level="info" additivity="true">
-        <appender-ref ref="APP_LOG"/>
-    </logger>
-
     <root level="DEBUG">
         <appender-ref ref="APP_LOG"/>
     </root>

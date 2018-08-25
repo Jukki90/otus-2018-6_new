@@ -50,8 +50,6 @@ public class CacheEngineImpl<K, V> implements CacheEngine<K, V> {
         if (element != null) {
             hit++;
             element.setAccessed();
-        } else {
-            miss++;
         }
         return element;
     }
@@ -79,6 +77,7 @@ public class CacheEngineImpl<K, V> implements CacheEngine<K, V> {
                     MyElement<V> element = elements.get(key).get();
                     if (element == null || isT1BeforeT2(timeFunction.apply(element), System.currentTimeMillis())) {
                         elements.remove(key);
+                        miss++;
                         this.cancel();
                     }
                 }
@@ -89,4 +88,5 @@ public class CacheEngineImpl<K, V> implements CacheEngine<K, V> {
     private boolean isT1BeforeT2(long t1, long t2) {
         return t1 < t2 + TIME_THRESHOLD_MS;
     }
+
 }
