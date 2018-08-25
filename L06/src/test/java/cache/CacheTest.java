@@ -26,25 +26,18 @@ public class CacheTest {
         CacheEngine<Integer, BigObject> cache = new CacheEngineImpl<>(size, 120000, 0);
         for (int i = 0; i < size; i++) {
             cache.put(i, new MyElement<>(new BigObject()));
-            logger.info("String for {} : {}", i, (cache.get(i) != null ? cache.get(i).getValue() : "null"));
         }
         loadMemory();
         System.gc();
         logger.info("After GC ----------");
-        int nullObjects = 0;
         for (int i = 0; i < size; i++) {
             MyElement<BigObject> item = cache.get(i);
-            if (item != null) {
-                logger.info("String for {} : {}", i, item.getValue());
-
-            } else {
-                nullObjects++;
-                logger.info("String for {} : {}", i, null);
-            }
+            logger.info("String for {} : {}", i, (item != null ? item.getValue() : "null"));
         }
-        logger.info("Missed Objects: {}", nullObjects);
+        logger.info("Cache hits: {}", cache.getHitCount());
+        logger.info("Cache size: {}", cache.getSize());
+        assertTrue("Размер кэша не изменился!", cache.getSize() < size);
         cache.dispose();
-        assertTrue("Все объекты кэша остались на месте", nullObjects > 0);
     }
 
 
@@ -55,11 +48,11 @@ public class CacheTest {
         for (int i = 0; i < size; i++) {
             cache.put(i, new MyElement<>("String: " + i));
         }
-
+        assertTrue("Кэш обнулился раньше времени!", cache.getSize() != 0);
         logger.info("Cache hits: {}", cache.getHitCount());
-        logger.info("Cache misses: {}", cache.getMissCount());
+        logger.info("Cache size: {}", cache.getSize());
 
-        await().atMost(4, SECONDS).until(() -> (cache.getMissCount() == size));
+        await().atMost(4, SECONDS).until(() -> (cache.getSize() == 0));
 
         logger.info("Result cache:");
         for (int i = 0; i < size; i++) {
@@ -67,7 +60,7 @@ public class CacheTest {
             logger.info("String for {} : {}", i, (element != null ? element.getValue() : "null"));
         }
         logger.info("Cache hits: {}", cache.getHitCount());
-        logger.info("Cache misses: {}", cache.getMissCount());
+        logger.info("Cache size: {}", cache.getSize());
         cache.dispose();
     }
 

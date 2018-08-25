@@ -12,7 +12,6 @@ public class CacheEngineImpl<K, V> implements CacheEngine<K, V> {
     private final long idleTimeMs;
 
     private int hit = 0;
-    private int miss = 0;
 
     private Map<K, SoftReference<MyElement<V>>> elements = new LinkedHashMap<>();
     private final Timer timer = new Timer();
@@ -60,8 +59,14 @@ public class CacheEngineImpl<K, V> implements CacheEngine<K, V> {
     }
 
     @Override
-    public int getMissCount() {
-        return miss;
+    public int getSize() {
+        int k = 0;
+        for (int i = 0; i < elements.size(); i++) {
+            if (elements.get(i).get() != null) {
+                k++;
+            }
+        }
+        return k;
     }
 
     @Override
@@ -77,7 +82,6 @@ public class CacheEngineImpl<K, V> implements CacheEngine<K, V> {
                     MyElement<V> element = elements.get(key).get();
                     if (element == null || isT1BeforeT2(timeFunction.apply(element), System.currentTimeMillis())) {
                         elements.remove(key);
-                        miss++;
                         this.cancel();
                     }
                 }

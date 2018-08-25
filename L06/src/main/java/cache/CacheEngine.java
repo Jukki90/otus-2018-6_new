@@ -8,7 +8,7 @@ public interface CacheEngine<K, V> {
 
     int getHitCount();
 
-    int getMissCount();
+    int getSize();
 
     void dispose();
 }
