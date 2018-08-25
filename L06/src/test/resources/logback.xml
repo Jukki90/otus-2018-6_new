@@ -9,12 +9,6 @@
 
 
     <appender name="APP_LOG" class="ch.qos.logback.core.FileAppender">
-        <filter class="ch.qos.logback.classic.filter.LevelFilter">
-            <level>INFO</level>
-            <onMatch>ACCEPT</onMatch>
-            <onMismatch>DENY</onMismatch>
-        </filter>
-
         <file>logs/application.log</file>
         <encoder>
             <pattern>%date %level [%thread] [%file:%line] %msg%n</pattern>

@@ -1,14 +1,12 @@
 package cache;
 
-public class MyElement<K, V> {
-    private final K key;
+public class MyElement<V> {
     private final V value;
     private final long creationTime;
     private long lastAccessTime;
 
 
-    public MyElement(K key, V value) {
-        this.key = key;
+    public MyElement(V value) {
         this.value = value;
         this.creationTime = getCurrentTime();
         this.lastAccessTime = getCurrentTime();
@@ -16,10 +14,6 @@ public class MyElement<K, V> {
 
     protected long getCurrentTime() {
         return System.currentTimeMillis();
-    }
-
-    public K getKey() {
-        return key;
     }
 
     public V getValue() {

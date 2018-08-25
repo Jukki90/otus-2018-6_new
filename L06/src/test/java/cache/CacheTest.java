@@ -8,20 +8,21 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.awaitility.Awaitility.await;
 import static org.junit.Assert.*;
 
 public class CacheTest {
     private static Logger logger = LoggerFactory.getLogger(CacheTest.class);
-    List<String> loadMemoryList = new ArrayList<>();
-    int size;
+    private List<String> loadMemoryList = new ArrayList<>();
+    private int size;
 
     @Test
     public void weaknessTest() {
         int size = 20000;
-        int miss = 0;
+        int miss;
         CacheEngine<Integer, BigObject> cache = new CacheEngineImpl<>(size, 120000, 0);
         for (int i = 0; i < size; i++) {
-            cache.put(new MyElement<>(i, new BigObject()));
+            cache.put(i, new MyElement<>(new BigObject()));
             logger.info("String for {} : {}", i, (cache.get(i) != null ? cache.get(i).getValue() : "null"));
         }
         loadMemory();
@@ -38,33 +39,34 @@ public class CacheTest {
     }
 
 
-    @Test
+    @Test(timeout = 3000)
     public void lifeTimeTest() {
         size = 10;
         CacheEngine<Integer, String> cache = new CacheEngineImpl<>(size, 1000, 0);
         for (int i = 0; i < size; i++) {
-            cache.put(new MyElement<>(i, "String: " + i));
+            cache.put(i, new MyElement<>("String: " + i));
         }
         for (int i = 0; i < size; i++) {
-            MyElement<Integer, String> element = cache.get(i);
+            MyElement<String> element = cache.get(i);
             logger.info("String for {} : {}", i, (element != null ? element.getValue() : "null"));
         }
-        assertTrue(cache.getMissCount() == 0);
         logger.info("Cache hits: {}", cache.getHitCount());
         logger.info("Cache misses: {}", cache.getMissCount());
+
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
             logger.error("Возникло исключение ", e);
             Assert.fail("Возникл прерывание во время ожидания! ");
         }
+        System.gc();
         for (int i = 0; i < size; i++) {
-            MyElement<Integer, String> element = cache.get(i);
+            MyElement<String> element = cache.get(i);
             logger.info("String for {} : {}", i, (element != null ? element.getValue() : "null"));
         }
+        await().until(() -> (cache.getMissCount() == size));
         logger.info("Cache hits: {}", cache.getHitCount());
         logger.info("Cache misses: {}", cache.getMissCount());
-        assertTrue(cache.getMissCount() == size);
         cache.dispose();
     }
 
@@ -74,7 +76,7 @@ public class CacheTest {
         int offset = 2;
         CacheEngine<Integer, String> cache = new CacheEngineImpl<>(size, 100000, 0);
         for (int i = 0; i < size + offset; i++) {
-            cache.put(new MyElement<>(i, String.valueOf(i)));
+            cache.put(i, new MyElement<>(String.valueOf(i)));
         }
         for (int i = 0; i < offset; i++) {
             assertNull("Лишние элементы не затерлись! ", cache.get(i));
