@@ -23,7 +23,6 @@ public class CacheTest {
     @Test
     public void weaknessTest() {
         int size = 20000;
-        int miss;
         CacheEngine<Integer, BigObject> cache = new CacheEngineImpl<>(size, 120000, 0);
         for (int i = 0; i < size; i++) {
             cache.put(i, new MyElement<>(new BigObject()));
