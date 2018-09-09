@@ -3,7 +3,6 @@ package atm.impl;
 import atm.api.ATM;
 import atm.api.Cell;
 import exceptions.CellIsEmptyException;
-import exceptions.CellOverFilledException;
 import money.Currency;
 import money.impl.RoubleBanknote;
 import money.interfaces.Banknote;
@@ -53,13 +52,15 @@ public class RoubleATM implements ATM {
             summa = remainder;
         }
         if (remainder > 0) {
+            logger.info("Возвращаем купюры обратно");
+            putCash(result);
             throw new CellIsEmptyException("Нельзя выдать сумму имеющимися купюрами!");
         }
         return result;
     }
 
 
-    public void putCash(List<? extends Banknote> money) throws CellOverFilledException {
+    public void putCash(List<? extends Banknote> money) {
         for (int j = 0; j < money.size(); j++) {
             Banknote banknote = money.get(j);
             if (banknote instanceof RoubleBanknote) {
@@ -71,7 +72,7 @@ public class RoubleATM implements ATM {
     }
 
 
-    private void putRoubleBanknote(RoubleBanknote banknote) throws CellOverFilledException {
+    private void putRoubleBanknote(RoubleBanknote banknote) {
         for (int i = 0; i < roubleCells.size(); i++) {
             if (roubleCells.get(i).getNominal() == banknote.getNominal()) {
                 roubleCells.get(i).putBanknote(banknote);

@@ -2,7 +2,6 @@ package atm.impl;
 
 import atm.api.Cell;
 import exceptions.CellIsEmptyException;
-import exceptions.CellOverFilledException;
 import money.Currency;
 import money.interfaces.Banknote;
 
@@ -22,9 +21,10 @@ public class ConcreteCell implements Cell {
     }
 
 
-    public void putBanknote(Banknote banknote) throws CellOverFilledException {
+    public void putBanknote(Banknote banknote) {
+
         if (list.size() == CAPACITY) {
-            throw new CellOverFilledException();
+            throw new IndexOutOfBoundsException("Невозможно поместить больше купюр в ячейку!");
         }
         if (banknote.getNominal() != nominal) {
             throw new IllegalArgumentException("Номинал купюры отличен от ожидаемого!");
