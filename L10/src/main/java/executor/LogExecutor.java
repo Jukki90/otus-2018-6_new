@@ -26,13 +26,14 @@ public class LogExecutor {
     }
 
     public <T> T execQuery(String query, TResultHandler<T> handler) throws SQLException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-        Statement stmt = connection.createStatement();
-        stmt.execute(query);
-        ResultSet result = stmt.getResultSet();
-        T value = handler.handle(result);
-        result.close();
-        stmt.close();
-        return value;
+        try (Statement stmt = connection.createStatement();) {
+            stmt.execute(query);
+            ResultSet result = stmt.getResultSet();
+            T value = handler.handle(result);
+            result.close();
+            stmt.close();
+            return value;
+        }
     }
 
     public int execUpdate(String update) throws SQLException {

@@ -3,21 +3,24 @@ package connection;
 import base.DBService;
 import base.DataSet;
 import executor.LogExecutor;
-import org.apache.commons.lang.ArrayUtils;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.StringJoiner;
+import java.util.*;
 
 public class DBServiceImpl extends ConnectionHelper implements DBService {
-    private static final String CREATE_TABLE_USER = "create table if not exists user (id bigint NOT NULL auto_increment primary key, name varchar(255),age int(3))";
-    private static final String INSERT_USER = "insert into user (name,age) values ('%s')";
-    private static final String INSERT_DATA_SET = "insert into user (%s) VALUES ('%s')";
-    private static final String SElECT = "select %s from user where id = '%d'";
-    private static final String DELETE_USER = "drop table user";
+    private static final String CREATE_TABLE_USER = "create table if not exists %s (id bigint NOT NULL auto_increment primary key, name varchar(255),age int(3))";
+    private static final String INSERT_DATA_SET = "insert into %s (%s) VALUES ('%s')";
+    private static final String SElECT = "select %s from %s where id = '%d'";
+    private static final String DELETE_USER = "drop table %s";
+
+    public static final String SEMICOLON_DELIMETER = ",";
+    public static final String SEMICOLON_DELIMETER_WITH_QUOTES = "\',\'";
+    public static final String USER_TABLE_NAME = "user";
     private final Connection connection;
 
     public DBServiceImpl() {
@@ -27,7 +30,8 @@ public class DBServiceImpl extends ConnectionHelper implements DBService {
     @Override
     public void prepareTables() throws SQLException {
         LogExecutor exec = new LogExecutor(getConnection());
-        exec.execUpdate(CREATE_TABLE_USER);
+        String query = String.format(CREATE_TABLE_USER, USER_TABLE_NAME);
+        exec.execUpdate(query);
         System.out.println("Table created");
     }
 
@@ -35,8 +39,8 @@ public class DBServiceImpl extends ConnectionHelper implements DBService {
     @Override
     public <T extends DataSet> void save(T user) throws SQLException {
         Field[] fields = user.getClass().getDeclaredFields();
-        StringJoiner joinerKeys = new StringJoiner(",");
-        StringJoiner joinerValues = new StringJoiner("\',\'");
+        StringJoiner joinerKeys = new StringJoiner(SEMICOLON_DELIMETER);
+        StringJoiner joinerValues = new StringJoiner(SEMICOLON_DELIMETER_WITH_QUOTES);
         for (int i = 0; i < fields.length; i++) {
             fields[i].setAccessible(true);
             joinerKeys.add(fields[i].getName());
@@ -46,7 +50,7 @@ public class DBServiceImpl extends ConnectionHelper implements DBService {
                 e.printStackTrace();
             }
         }
-        String query = String.format(INSERT_DATA_SET, joinerKeys.toString(), joinerValues.toString());
+        String query = String.format(INSERT_DATA_SET, USER_TABLE_NAME, joinerKeys.toString(), joinerValues.toString());
         System.out.println("Query:" + query);
         LogExecutor exec = new LogExecutor(getConnection());
         int rows = exec.execUpdate(query);
@@ -58,39 +62,77 @@ public class DBServiceImpl extends ConnectionHelper implements DBService {
     @Override
     public <T extends DataSet> T load(long id, Class<T> clazz) throws SQLException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         LogExecutor exec = new LogExecutor(getConnection());
-        String query = String.format(SElECT, "id,name,age", id);
+        StringJoiner joinerKeys = new StringJoiner(SEMICOLON_DELIMETER);
+        getFieldNames(clazz).forEach((item) -> {
+            joinerKeys.add(item);
+        });
+        String query = String.format(SElECT, joinerKeys.toString(), USER_TABLE_NAME, id);
         System.out.println("Query:" + query);
+
         return exec.execQuery(query, resultSet -> {
             DataSet dataSet = null;
             try {
                 resultSet.first();
-                Field[] fields = (Field[]) ArrayUtils.addAll(DataSet.class.getDeclaredFields(), clazz.getDeclaredFields());
-
-                Object[] constructorArguments = new Object[fields.length];
-                for (int i = 0; i < fields.length; i++) {
-                    fields[i].setAccessible(true);
-                    constructorArguments[i] = resultSet.getObject(fields[i].getName());
-                }
-                Class<?>[] classes = toClasses(constructorArguments);
-                dataSet = clazz.getDeclaredConstructor(classes).newInstance(constructorArguments);
-            } catch (SQLException | IllegalAccessException | InstantiationException | NoSuchMethodException | InvocationTargetException e) {
+                dataSet = setFields(clazz, resultSet);
+            } catch (SQLException | IllegalAccessException | InstantiationException | NoSuchMethodException | InvocationTargetException | NoSuchFieldException e) {
                 e.printStackTrace();
             }
             return (T) dataSet;
         });
     }
 
+    private <T> T setFields(Class<T> clazz, ResultSet resultSet) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, SQLException, NoSuchFieldException {
+        Constructor<T> constructor = clazz.getDeclaredConstructor();
+        constructor.setAccessible(true);
+        T result = constructor.newInstance();
+
+        Map<String, Field> fields = getFields(clazz);
+        fields.forEach((k, v) -> {
+            v.setAccessible(true);
+            try {
+                v.set(result, resultSet.getObject(k));
+            } catch (IllegalAccessException | SQLException e) {
+                e.printStackTrace();
+            }
+        });
+        return result;
+    }
+
+    private Map<String, Field> getFields(Class<?> clazz) {
+        Map<String, Field> fields = new HashMap<>();
+        while (clazz != null) {
+            for (Field field : clazz.getDeclaredFields()) {
+                if (!fields.containsKey(field.getName())) {
+                    fields.put(field.getName(), field);
+                }
+            }
+            clazz = clazz.getSuperclass();
+        }
+        return fields;
+    }
+
+    private List<String> getFieldNames(Class<?> clazz) {
+        List<String> fields = new ArrayList<>();
+        while (clazz != null) {
+            for (Field field : clazz.getDeclaredFields()) {
+                if (!fields.contains(field.getName())) {
+                    fields.add(field.getName());
+                }
+            }
+            clazz = clazz.getSuperclass();
+        }
+        return fields;
+    }
+
 
     @Override
     public void deleteTables() throws SQLException {
         LogExecutor exec = new LogExecutor(getConnection());
-        exec.execUpdate(DELETE_USER);
+        String query = String.format(DELETE_USER, USER_TABLE_NAME);
+        exec.execUpdate(query);
         System.out.println("Table dropped");
     }
 
-    private static Class<?>[] toClasses(Object[] args) {
-        return Arrays.stream(args).map(Object::getClass).toArray(Class[]::new);
-    }
 
     @Override
     public void close() throws Exception {

@@ -1,8 +1,8 @@
 package base;
 
 public class UserDataSet extends DataSet {
-    protected final String name;
-    protected final int age;
+    protected String name;
+    protected int age;
 
     public String getName() {
         return name;
@@ -22,6 +22,9 @@ public class UserDataSet extends DataSet {
         this.id = id;
         this.name = name;
         this.age = age;
+    }
+
+    private UserDataSet() {
     }
 
     @Override
