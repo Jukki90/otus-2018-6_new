@@ -3,6 +3,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
 
 public class SortingTest {
@@ -14,7 +15,10 @@ public class SortingTest {
         int[] arr = {1, 4, 2, 6, 8, 9, 11, 3, 99, 33, 44, 55, 0, 88, 22, 55};
         logger.info("initial array: {}", arr);
         int thNumber = 4;
-        Assert.assertArrayEquals(SingleThreadSorter.sort(arr.clone()), MultiThreadSorter.sort(arr, thNumber));
+        int[] arrExpected = arr.clone();
+        Arrays.sort(arrExpected);
+        Assert.assertArrayEquals(arrExpected, MultiThreadSorter.sort(arr, thNumber));
+        MultiThreadSorter.sort(arr, thNumber);
     }
 
     @Test
@@ -22,7 +26,9 @@ public class SortingTest {
         logger.info("--- Sorting started ----------------");
         int[] arr = {121, 1, 4, 2, 6, 8, 9, 11, 3, 99, 33, 44, 55, 0, 88, 22, 55};
         int thNumber = 4;
-        Assert.assertArrayEquals(SingleThreadSorter.sort(arr.clone()), MultiThreadSorter.sort(arr, thNumber));
+        int[] arrExpected = arr.clone();
+        Arrays.sort(arrExpected);
+        Assert.assertArrayEquals(arrExpected, MultiThreadSorter.sort(arr, thNumber));
     }
 
     @Test
@@ -30,7 +36,9 @@ public class SortingTest {
         logger.info("--- Sorting started ----------------");
         int[] arr = {121, 1, 4};
         int thNumber = 4;
-        Assert.assertArrayEquals(SingleThreadSorter.sort(arr.clone()), MultiThreadSorter.sort(arr, thNumber));
+        int[] arrExpected = arr.clone();
+        Arrays.sort(arrExpected);
+        Assert.assertArrayEquals(arrExpected, MultiThreadSorter.sort(arr, thNumber));
     }
 
 
@@ -44,6 +52,8 @@ public class SortingTest {
             arr[i] = (int) (100 * Math.random() + 1);
         }
         logger.info("Initial array: {}", arr);
-        Assert.assertArrayEquals(SingleThreadSorter.sort(arr.clone()), MultiThreadSorter.sort(arr, thNumber));
+        int[] arrExpected = arr.clone();
+        Arrays.sort(arrExpected);
+        Assert.assertArrayEquals(arrExpected, MultiThreadSorter.sort(arr, thNumber));
     }
 }

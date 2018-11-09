@@ -20,7 +20,7 @@ public class MultiThreadSorter {
             actualThNumber = (int) Math.ceil((double) arr.length / 10); // 10 выбрано методом "пальцем в небо" без каких-либо мат. расчетов оптимальной длины
         }
 
-        List<int[]> parts = divideToArrParts(arr, actualThNumber);
+        List<int[]> parts = divideToArrParts(arr.clone(), actualThNumber);
         // Определяем пул из actualThNumber потоков
         ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(actualThNumber);
         List<Future<int[]>> futures = new ArrayList<Future<int[]>>();

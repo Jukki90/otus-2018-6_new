@@ -8,7 +8,7 @@ public class SingleThreadSorter implements Callable {
     private static Logger logger = LoggerFactory.getLogger(SingleThreadSorter.class);
     private int[] arr;
 
-    public static synchronized int[] sort(int[] array) {
+    private static int[] sort(int[] array) {
         Arrays.sort(array);
         return array;
     }
