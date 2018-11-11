@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="
+    http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:component-scan base-package="ru.otus.L14"></context:component-scan>
+    <context:component-scan base-package="dbservice"></context:component-scan>
+    <context:component-scan base-package="cache"></context:component-scan>
+    <context:annotation-config/>
+    <context:spring-configured/>
+    <bean id="adminServlet" class="servlet.AdminServlet">
+        <property name="dbService" ref="cacheService"/>
+    </bean>
+
+    <bean id="cacheService" class="dbservice.CacheServiceImpl" >
+        <property name="cacheEngine" ref="cacheEngineImpl"/>
+    </bean>
+
+    <bean id="cacheEngineImpl" class="cache.CacheEngineImpl">
+        <constructor-arg value="1000"/>
+        <constructor-arg value="10000000"/>
+        <constructor-arg value="10000000"/>
+    </bean>
+    <bean id ="templateProcessor" class="servlet.TemplateProcessor"/>
+</beans>

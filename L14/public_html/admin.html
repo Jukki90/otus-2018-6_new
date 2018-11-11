@@ -1,0 +1,65 @@
+<html xmlns="http://www.w3.org/1999/xhtml" content="text/html;">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>АРМ</title>
+    <link rel="stylesheet" type="text/css" href="/common.css">
+    <SCRIPT language="javascript">
+function addFields() {
+	//Create an input type dynamically.
+	var element = document.createElement("input");
+
+	//Assign different attributes to the element.
+	element.setAttribute("type", "text");
+	element.setAttribute("name", "phone");
+	var foo = document.getElementById("container");
+
+	//Append the element in page (in span).
+	foo.appendChild(document.createElement("br"));
+	foo.appendChild(element);
+}
+
+function removeFields() {
+    var foo = document.getElementById("container");
+    foo.removeChild(foo.lastChild);
+
+}
+
+    </SCRIPT>
+</head>
+<body>
+<div class="top">
+<h3>Добавить пользователя:</h3>
+    <form action="/L14/admin" method="POST" id="addUser">
+        <input type="text" name="username" placeholder="username"/>
+        <br/>
+        <input type="number" name="age" placeholder="18"/>
+        <br/>
+        <div id="container">
+            <input type="text" id="phone" name="phone" placeholder="phone"/>
+        </div>
+<div class="wrapper">
+        <a href="#" id="addPhoneField" onclick="addFields()" class="buttons">Add phone number</a>
+        <a href="#" id="removePhoneFields" onclick="removeFields()" class="buttons">Remove phone number</a>
+</div>
+
+        <input type="text" name="address" placeholder="address"/>
+
+        <button type="submit">Save</button>
+    </form>
+
+    <h3>Найти пользователя по id:</h3>
+    <form action="/L14/admin" method="GET" id="searchUser">
+        <input type="text" name="userid" placeholder="userid"/>
+        <button type="submit">Search</button>
+    </form>
+
+    <h3>Общее число пользователей:</h3>
+    <a href="/L14/admin?shownumber=true" class="buttons">Show number of users</a>
+
+    <h3>Результат:</h3>
+    <div>
+        <p>${result}</p>
+    </div>
+</div>
+</body>
+</html>
