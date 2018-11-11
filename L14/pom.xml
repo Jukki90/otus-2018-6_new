@@ -127,14 +127,9 @@
         <plugins>
             <plugin>
                 <artifactId>maven-war-plugin</artifactId>
-                <version>2.3</version>
+                <version>3.2.2</version>
                 <configuration>
                     <webXml>src/main/resources/WEB-INF/web.xml</webXml>
-                    <webResources>
-                        <resource>
-                            <directory>public_html</directory>
-                        </resource>
-                    </webResources>
                 </configuration>
             </plugin>
         </plugins>

@@ -24,7 +24,7 @@
     </listener>
     <context-param>
         <param-name>contextConfigLocation</param-name>
-        <param-value>SpringBeans.xml</param-value>
+        <param-value>classpath:SpringBeans.xml</param-value>
     </context-param>
 
     <init-param>
