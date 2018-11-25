@@ -1,0 +1,90 @@
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="
+           http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+    <context:component-scan base-package="ru.otus.L15.1"></context:component-scan>
+    <!--context:component-scan base-package="dbservice"></context:component-scan>
+    <context:component-scan base-package="cache"></context:component-scan-->
+    <context:annotation-config/>
+    <context:spring-configured/>
+    <bean id="dbAddress" class="messageSystem.Address" scope="prototype">
+        <constructor-arg index="0" value="DB"/>
+    </bean>
+
+    <bean id="frontAddress" class="messageSystem.Address" scope="prototype">
+        <constructor-arg index="0" value="Frontend"/>
+    </bean>
+
+    <bean id="adminServlet" class="servlet.AdminServlet">
+        <property name="dbService" ref="cacheService"/>
+    </bean>
+
+
+    <bean id="wsServlet" class="ws.WebSocketChatServlet">
+    </bean>
+
+    <bean id="msContext" class="messageSystem.MessageSystemContext">
+        <constructor-arg name="messageSystem" ref="messageSystem"/>
+        <property name="frontAddress" ref="frontAddress"/>
+        <property name="dbAddress" ref="dbAddress"/>
+    </bean>
+
+    <bean id="messageSystem" class="messageSystem.MessageSystem">
+    </bean>
+
+
+    <bean id="cacheService" class="dbservice.CacheServiceImpl" init-method="init">
+        <property name="cacheEngine" ref="cacheEngineImpl"/>
+        <property name="context" ref="msContext"/>
+        <property name="address" ref="dbAddress"/>
+    </bean>
+
+    <bean id="cacheEngineImpl" class="cache.CacheEngineImpl">
+        <constructor-arg value="1000"/>
+        <constructor-arg value="10000000"/>
+        <constructor-arg value="10000000"/>
+    </bean>
+
+    <!--bean id="webSocketService" class="ws.WSocket">
+        <property name="frontendService" ref="frontendService"/>
+    </bean>
+
+    <bean id="frontendServiceImpl" class="front.FrontendServiceImpl" init-method="init">
+        <constructor-arg name="context" ref="msContext"/>
+        <property name="address" ref="frontAddress"/>
+
+    </bean-->
+    <bean id="frontendService" class="front.FrontendServiceImpl" init-method="init">
+        <constructor-arg name="context" ref="msContext"/>
+        <constructor-arg name="address" ref="frontAddress"/>
+        <constructor-arg name="webSockets" ref="webSocketService"/>
+    </bean>
+
+    <bean id="templateProcessor" class="servlet.TemplateProcessor"/>
+
+    <bean id="webSocketService" class="ws.WebSocketsHolderImpl">
+    </bean>
+
+    <bean id="wsCreator" class="ws.WSCreator">
+    </bean>
+
+    <bean id="applicationContextProvider" class="ws.ApplicationContextProvider"/>
+
+    <!--bean id="msgGetCountRq" class="messageSystem.message.MessageGetCount">
+        <property name="dbService" ref="cacheService"/>
+    </bean>
+
+
+    <bean id="msgGetCountRs" class="messageSystem.message.MessageGetCountResponse">
+        <constructor-arg index="0" value="Frontend"/>
+        <property name="frontendService" ref="frontendServiceImpl"/>
+    </bean-->
+
+
+
+</beans>
