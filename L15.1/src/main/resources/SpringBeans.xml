@@ -10,7 +10,9 @@
     <context:component-scan base-package="ru.otus.L15.1"></context:component-scan>
     <!--context:component-scan base-package="dbservice"></context:component-scan>
     <context:component-scan base-package="cache"></context:component-scan-->
-    <context:annotation-config/>
+
+
+    <context:component-scan base-package="messageSystem"/>
     <context:spring-configured/>
     <bean id="dbAddress" class="messageSystem.Address" scope="prototype">
         <constructor-arg index="0" value="DB"/>
@@ -28,19 +30,19 @@
     <bean id="wsServlet" class="ws.WebSocketChatServlet">
     </bean>
 
-    <bean id="msContext" class="messageSystem.MessageSystemContext">
+    <bean id="messageSystemContext" class="messageSystem.MessageSystemContext" scope="prototype">
         <constructor-arg name="messageSystem" ref="messageSystem"/>
         <property name="frontAddress" ref="frontAddress"/>
         <property name="dbAddress" ref="dbAddress"/>
     </bean>
 
-    <bean id="messageSystem" class="messageSystem.MessageSystem">
-    </bean>
+    <!--bean id="messageSystem" class="messageSystem.MessageSystem">
+    </bean-->
 
 
     <bean id="cacheService" class="dbservice.CacheServiceImpl" init-method="init">
         <property name="cacheEngine" ref="cacheEngineImpl"/>
-        <property name="context" ref="msContext"/>
+        <property name="context" ref="messageSystemContext"/>
         <property name="address" ref="dbAddress"/>
     </bean>
 
@@ -55,12 +57,12 @@
     </bean>
 
     <bean id="frontendServiceImpl" class="front.FrontendServiceImpl" init-method="init">
-        <constructor-arg name="context" ref="msContext"/>
+        <constructor-arg name="context" ref="messageSystemContext"/>
         <property name="address" ref="frontAddress"/>
 
     </bean-->
     <bean id="frontendService" class="front.FrontendServiceImpl" init-method="init">
-        <constructor-arg name="context" ref="msContext"/>
+        <constructor-arg name="context" ref="messageSystemContext"/>
         <constructor-arg name="address" ref="frontAddress"/>
         <constructor-arg name="webSockets" ref="webSocketService"/>
     </bean>
@@ -85,6 +87,6 @@
         <property name="frontendService" ref="frontendServiceImpl"/>
     </bean-->
 
-
+    <context:annotation-config></context:annotation-config>
 
 </beans>

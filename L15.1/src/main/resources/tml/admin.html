@@ -31,8 +31,9 @@ var ws;
  messageTextArea.value += "Server Connect..."+"\n";
     }
     ws.onmessage = function (event) {
-     var result = JSON.parse(event.data)
-messageTextArea.value += "Receive from server: " + result + "\n";
+     //var result = JSON.parse(event.data)
+//messageTextArea.value += "Receive from server: " + result + "\n";
+messageTextArea.value += "Receive from server: " + event.data + "\n";
     }
     ws.onclose = function (event) {
 messageTextArea.value += "Server connection closed " + "\n";
@@ -44,11 +45,20 @@ messageTextArea.value += "Server connection closed " + "\n";
 };
 
 function sendMessage() {
-var message="go";
-    ws.send(message);
-}
+   var obj = new Object();
+   obj.method = "GET_COUNT";
+   var jsonString= JSON.stringify(obj);
+    ws.send(jsonString)
+};
 
+function getUserById() {
 
+   var obj = new Object();
+   obj.method = "GET_USER_BY_ID";
+   obj.id  = document.getElementById("userid").value;
+   var jsonString= JSON.stringify(obj);
+    ws.send(jsonString);
+};
 
 
 
@@ -77,8 +87,8 @@ var message="go";
 
     <h3>Найти пользователя по id:</h3>
     <form action="/L15.1/admin" method="GET" id="searchUser">
-        <input type="text" name="userid" placeholder="userid"/>
-        <button type="submit">Search</button>
+        <input type="text" name="userid" id="userid" placeholder="userid"/>
+        <button type="button" onclick="getUserById();">Search</button>
     </form>
 
     <!--h3>Общее число пользователей:</h3-->

@@ -1,14 +1,13 @@
 package ws;
 
 
+import com.google.gson.Gson;
 import front.FrontendService;
-import org.eclipse.jetty.websocket.api.annotations.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.eclipse.jetty.websocket.api.Session;
+import org.eclipse.jetty.websocket.api.annotations.*;
+import ws.jsondata.CommandInfo;
 
 import java.io.IOException;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.logging.Logger;
 
 //@ServerEndpoint(value = "/ws", configurator = SpringConfigurator.class)
@@ -16,6 +15,9 @@ import java.util.logging.Logger;
 @WebSocket
 public class WSocket {
     private static final Logger logger = Logger.getLogger(WSocket.class.getName());
+    public static final String GET_USER_BY_ID = "GET_USER_BY_ID";
+    public static final String GET_COUNT = "GET_COUNT";
+    public static final String CREATE_USER = "CREATE_USER";
 
     private Session session;
     private String socketId;
@@ -36,7 +38,6 @@ public class WSocket {
     }
 
 
-
     //@OnOpen
     @OnWebSocketConnect
     public void open(Session session) {
@@ -51,7 +52,7 @@ public class WSocket {
 
     //@OnClose
     @OnWebSocketClose
-    public void closedConnection(int statusCode,String reason) {
+    public void closedConnection(int statusCode, String reason) {
         logger.info("close");
         frontendService.getWebSocketsHolder().remove(this);
     }
@@ -63,23 +64,39 @@ public class WSocket {
     }
 
 
-    //@OnMessage
     @OnWebSocketMessage
     public void onMessage(Session session, String msg) {
-        logger.info("Получено сообщение"+msg);
+        logger.info("Получено сообщение" + msg);
         this.session = session;
-        this.frontendService.count(socketId);
+        Gson g = new Gson();
+
+        CommandInfo commandInfo = g.fromJson(msg, CommandInfo.class);
+        String method = commandInfo.getMethod();
+
+        switch (method) {
+            case GET_USER_BY_ID:
+                long userId = commandInfo.getUserId();
+                this.frontendService.getUserById(socketId, userId);
+                break;
+            case GET_COUNT:
+                this.frontendService.count(socketId);
+                break;
+
+            case CREATE_USER:
+                break;
+            default:
+                logger.info("Не обрабатывается метод с таким праметром");
+
+        }
+
+        // this.frontendService.count(socketId);
         logger.info("onMessage finished");
     }
 
     public void sendMessage(String cacheParams) {
         try {
-            this.session.getRemote().sendString(cacheParams);
-
-            //for (Session sess : session.getOpenSessions()) {
-                if (session.isOpen())
-                    session.getRemote().sendString(cacheParams);
-            //}
+            if (session.isOpen())
+                session.getRemote().sendString(cacheParams);
         } catch (IOException e) {
             logger.info(e.getMessage());
         }

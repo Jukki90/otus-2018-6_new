@@ -1,8 +1,6 @@
 package front;
 
-import messageSystem.Address;
 import messageSystem.Addressee;
-import messageSystem.MessageSystem;
 import ws.WebSocketsHolder;
 
 public interface FrontendService extends Addressee {
@@ -10,8 +8,12 @@ public interface FrontendService extends Addressee {
 
     void count(String socketId);
 
-    void returnNumberOfUsers(String result,String socketId);
+    void returnNumberOfUsers(String result, String socketId);
     //void addUser(int id, String name);
+
+    void getUserById(String socketId, long id);
+
+    void returnUserById(String result, String socketId);
 
     WebSocketsHolder getWebSocketsHolder();
 }

@@ -15,8 +15,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.logging.Logger;
 
-//@Service
-@Component
+//@Component
+@Service
 public class CacheServiceImpl implements DBService {
     private static final Logger logger = Logger.getLogger(FrontendServiceImpl.class.getName());
     private Long counter=0L;
@@ -46,17 +46,18 @@ public class CacheServiceImpl implements DBService {
     }
 
     //@Autowired
+   // @Qualifier("msContext")
     private MessageSystemContext context;
 
 
-/*
-    public CacheEngineImpl getCacheEngine() {
+
+    public CacheEngine getCacheEngine() {
         return cacheEngine;
     }
 
-    public void setCacheEngine(CacheEngineImpl cacheEngine) {
+    public void setCacheEngine(CacheEngine cacheEngine) {
         this.cacheEngine = cacheEngine;
-    }*/
+    }
 
     //@Autowired
     //private CacheEngineImpl cacheEngine;
