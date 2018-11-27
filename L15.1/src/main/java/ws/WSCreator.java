@@ -28,7 +28,6 @@ public class WSCreator implements WebSocketCreator {
     public Object createWebSocket(ServletUpgradeRequest req, ServletUpgradeResponse resp) {
         FrontendService front = ApplicationContextProvider.getApplicationContext().getBean("frontendService", FrontendService.class);
         WSocket socket = new WSocket(front);
-        log.info("WSocket created, socketId=" + socket.getSocketId());
         return socket;
     }
 }

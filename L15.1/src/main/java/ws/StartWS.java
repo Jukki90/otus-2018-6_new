@@ -16,7 +16,6 @@ public class StartWS {
 
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
 
-        //web chat
         context.addServlet(WebSocketChatServlet.class, "/L15.1/ws");
 
         Server server = new Server(PORT);
