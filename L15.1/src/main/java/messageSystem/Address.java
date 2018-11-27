@@ -12,7 +12,7 @@ public final class Address {
     private static final AtomicInteger ID_GENERATOR = new AtomicInteger();
     private final String id;
 
-    public Address(){
+    public Address() {
         id = String.valueOf(ID_GENERATOR.getAndIncrement());
     }
 

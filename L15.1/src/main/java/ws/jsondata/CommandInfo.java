@@ -2,7 +2,9 @@ package ws.jsondata;
 
 import base.UserDataSet;
 
-public class CommandInfo {
+import java.io.Serializable;
+
+public class CommandInfo implements Serializable {
     private String method;
     private UserDataSet userData;
 

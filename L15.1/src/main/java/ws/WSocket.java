@@ -1,7 +1,9 @@
 package ws;
 
 
+import base.UserDataSet;
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import front.FrontendService;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.*;
@@ -10,8 +12,7 @@ import ws.jsondata.CommandInfo;
 import java.io.IOException;
 import java.util.logging.Logger;
 
-//@ServerEndpoint(value = "/ws", configurator = SpringConfigurator.class)
-//@Controller
+
 @WebSocket
 public class WSocket {
     private static final Logger logger = Logger.getLogger(WSocket.class.getName());
@@ -21,24 +22,13 @@ public class WSocket {
 
     private Session session;
     private String socketId;
-    //@Autowired
     FrontendService frontendService;
 
-    /*
-        public FrontendService getFrontendService() {
-            return frontendService;
-        }
 
-        public void setFrontendService(FrontendService frontendService) {
-            this.frontendService = frontendService;
-        }
-    */
     public WSocket(FrontendService frontend) {
         this.frontendService = frontend;
     }
 
-
-    //@OnOpen
     @OnWebSocketConnect
     public void open(Session session) {
         logger.info("Start onOpen()");
@@ -46,18 +36,16 @@ public class WSocket {
         this.session = session;
         this.socketId = String.valueOf(session.hashCode());
         frontendService.getWebSocketsHolder().add(socketId, this);
-
         logger.info("End onOpen(). socketId=" + socketId);
     }
 
-    //@OnClose
+
     @OnWebSocketClose
     public void closedConnection(int statusCode, String reason) {
         logger.info("close");
         frontendService.getWebSocketsHolder().remove(this);
     }
 
-    //@OnError
     @OnWebSocketError
     public void error(Session session, Throwable t) {
         logger.info("ws error");
@@ -69,8 +57,12 @@ public class WSocket {
         logger.info("Получено сообщение" + msg);
         this.session = session;
         Gson g = new Gson();
-
-        CommandInfo commandInfo = g.fromJson(msg, CommandInfo.class);
+        CommandInfo commandInfo = null;
+        try {
+            commandInfo = g.fromJson(msg, CommandInfo.class);
+        } catch (JsonSyntaxException ex) {
+            ex.printStackTrace();
+        }
         String method = commandInfo.getMethod();
 
         switch (method) {
@@ -83,13 +75,14 @@ public class WSocket {
                 break;
 
             case CREATE_USER:
+                UserDataSet user = commandInfo.getUserData();
+                this.frontendService.save(socketId, user);
                 break;
             default:
                 logger.info("Не обрабатывается метод с таким праметром");
 
         }
 
-        // this.frontendService.count(socketId);
         logger.info("onMessage finished");
     }
 

@@ -11,5 +11,5 @@ public interface DBService extends AutoCloseable, Addressee {
 
     long count();
 
-    public void init();
+    void init();
 }

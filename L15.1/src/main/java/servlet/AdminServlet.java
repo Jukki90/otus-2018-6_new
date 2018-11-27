@@ -69,9 +69,9 @@ public class AdminServlet extends HttpServlet {
             int userid = Integer.parseInt(request.getParameter(USERID));
 
             userDataSetResult = dbService.load(userid, UserDataSet.class);
-            String value="";
-            if(userDataSetResult!=null){
-                value=userDataSetResult.getName();
+            String value = "";
+            if (userDataSetResult != null) {
+                value = userDataSetResult.getName();
             }
             pageVariables.put(RESULT, "Имя пользователя: " + value);
         }

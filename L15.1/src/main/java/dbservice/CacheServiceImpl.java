@@ -2,38 +2,31 @@ package dbservice;
 
 import base.DataSet;
 import cache.CacheEngine;
-import cache.CacheEngineImpl;
 import cache.MyElement;
 import front.FrontendServiceImpl;
 import messageSystem.Address;
 import messageSystem.MessageSystem;
 import messageSystem.MessageSystemContext;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.logging.Logger;
 
-//@Component
 @Service
 public class CacheServiceImpl implements DBService {
     private static final Logger logger = Logger.getLogger(FrontendServiceImpl.class.getName());
-    private Long counter=0L;
+    private Long counter = 0L;
 
-    public CacheServiceImpl(MessageSystemContext context, Address address, CacheEngine cacheEngine){
-        this.context=context;
-        this.address=address;
-        this.cacheEngine=cacheEngine;
+    public CacheServiceImpl(MessageSystemContext context, Address address, CacheEngine cacheEngine) {
+        this.context = context;
+        this.address = address;
+        this.cacheEngine = cacheEngine;
     }
-
-
 
     public void setAddress(Address address) {
         this.address = address;
     }
 
-    //@Autowired
     @Qualifier("dbAddress")
     private Address address;
 
@@ -45,11 +38,7 @@ public class CacheServiceImpl implements DBService {
         this.context = context;
     }
 
-    //@Autowired
-   // @Qualifier("msContext")
     private MessageSystemContext context;
-
-
 
     public CacheEngine getCacheEngine() {
         return cacheEngine;
@@ -59,25 +48,20 @@ public class CacheServiceImpl implements DBService {
         this.cacheEngine = cacheEngine;
     }
 
-    //@Autowired
-    //private CacheEngineImpl cacheEngine;
-
-    //@Autowired
     private CacheEngine cacheEngine;
 
     @Override
     public <T extends DataSet> void save(T user) {
         user.setId(counter);
-        cacheEngine.put(counter,new MyElement(user));
+        cacheEngine.put(counter, new MyElement(user));
         counter++;
     }
 
     @Override
     public <T extends DataSet> T load(long id, Class<T> clazz) {
-        if(cacheEngine.get(id)!=null) {
+        if (cacheEngine.get(id) != null) {
             return (T) cacheEngine.get(id).getValue();
-        }
-        else{
+        } else {
             return null;
         }
     }

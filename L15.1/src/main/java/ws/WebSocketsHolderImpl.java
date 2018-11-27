@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-public class WebSocketsHolderImpl implements WebSocketsHolder{
+public class WebSocketsHolderImpl implements WebSocketsHolder {
     private final Map<String, WSocket> webSockets = new ConcurrentHashMap<>();
 
     @Override

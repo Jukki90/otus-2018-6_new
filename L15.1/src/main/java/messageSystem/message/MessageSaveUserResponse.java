@@ -8,20 +8,19 @@ import messageSystem.MessageSystemContext;
 
 import java.util.logging.Logger;
 
-public class MessageFindUserResponse extends Message {
+public class MessageSaveUserResponse extends Message {
     private static final Logger logger = Logger.getLogger(MessageFindUserResponse.class.getName());
-
     private String result;
     private final MessageSystemContext context;
     private final String socketId;
 
-    public MessageFindUserResponse(Address from, Address to, String result, MessageSystemContext context, String socketId) {
+    public MessageSaveUserResponse(Address from, Address to, String result, MessageSystemContext context, String socketId) {
         super(from, to);
         this.result = result;
         this.context = context;
         this.socketId = socketId;
-    }
 
+    }
 
     @Override
     public void exec(Addressee addressee) {
@@ -33,6 +32,6 @@ public class MessageFindUserResponse extends Message {
     }
 
     public void exec(FrontendService frontendService) {
-        frontendService.returnUserById(result, socketId);
+        frontendService.returnNumberOfUsers(result, socketId);
     }
 }

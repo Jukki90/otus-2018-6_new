@@ -31,8 +31,6 @@ var ws;
  messageTextArea.value += "Server Connect..."+"\n";
     }
     ws.onmessage = function (event) {
-     //var result = JSON.parse(event.data)
-//messageTextArea.value += "Receive from server: " + result + "\n";
 messageTextArea.value += "Receive from server: " + event.data + "\n";
     }
     ws.onclose = function (event) {
@@ -60,49 +58,64 @@ function getUserById() {
     ws.send(jsonString);
 };
 
+function saveUser() {
 
+    var obj = new Object();
+    obj.method = "CREATE_USER";
+    var userData = new Object;
+    userData.name=document.getElementById("username").value;
+    userData.age=document.getElementById("age").value;
+    userData.phone=document.getElementById("phone").value;
+
+    var address = new Object;
+    address.street =  document.getElementById("address").value;
+    userData.address = address;
+
+    var phones = new Array();
+    var phone = new Object()
+    phone.number =  document.getElementById("phone").value;
+    phones[0] = phone;
+    userData.phones =  phones;
+    obj.userData = userData;
+
+    var jsonString= JSON.stringify(obj);
+    ws.send(jsonString);
+};
 
     </SCRIPT>
 </head>
 <body onload="init();">
 <div class="top">
     <h3>Добавить пользователя:</h3>
-    <form action="/L15.1/admin" method="POST" id="addUser">
-        <input type="text" name="username" placeholder="username"/>
+    <form action="" method="" id="addUser">
+        <input type="text" name="username" id="username" placeholder="username"/>
         <br/>
-        <input type="number" name="age" placeholder="18"/>
+        <input type="number" name="age" id="age" placeholder="18"/>
         <br/>
         <div id="container">
-            <input type="text" id="phone" name="phone" placeholder="phone"/>
+            <input type="text" id="phone" name="phone" id="phone" placeholder="phone"/>
         </div>
         <div class="wrapper">
             <a href="#" id="addPhoneField" onclick="addFields()" class="buttons">Add phone number</a>
             <a href="#" id="removePhoneFields" onclick="removeFields()" class="buttons">Remove phone number</a>
         </div>
 
-        <input type="text" name="address" placeholder="address"/>
+        <input type="text" name="address" id="address" placeholder="address"/>
 
-        <button type="submit">Save</button>
+        <input type="button" onclick="saveUser()" value="save"/>
     </form>
 
     <h3>Найти пользователя по id:</h3>
-    <form action="/L15.1/admin" method="GET" id="searchUser">
+    <form action="" method="GET" id="searchUser">
         <input type="text" name="userid" id="userid" placeholder="userid"/>
         <button type="button" onclick="getUserById();">Search</button>
     </form>
-
-    <!--h3>Общее число пользователей:</h3-->
-    <!--a href="javascript:sendMessage();" class="buttons">Show number of users</a-->
-    <!--a href="/L15.1/admin?shownumber=true" class="buttons">Show number of users</a-->
 
     <form name="message" action="">
         <input type="button" name="submitmsg" value="Общее число пользователей" onclick="sendMessage();"/>
     </form>
     <br><textarea id="messageTextArea" rows="10" cols="50"></textarea>
-    <h3>Результат:</h3>
-    <div>
-        <p>${result}</p>
-    </div>
+
 </div>
 </body>
 </html>

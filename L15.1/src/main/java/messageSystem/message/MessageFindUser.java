@@ -17,26 +17,25 @@ public class MessageFindUser extends Message {
     private final long userId;
 
 
-    public MessageFindUser(Address from, Address to, MessageSystemContext context, String socketId, long userId){
+    public MessageFindUser(Address from, Address to, MessageSystemContext context, String socketId, long userId) {
         super(from, to);
         this.context = context;
         this.socketId = socketId;
-        this.userId =userId;
+        this.userId = userId;
     }
 
     @Override
     public void exec(Addressee addressee) {
         if (addressee instanceof DBService) {
             exec((DBService) addressee);
-        }else{
+        } else {
             logger.info("Зарос андресован не к ДБ сервису!");
         }
     }
 
 
     public void exec(DBService dbService) {
-
-        UserDataSet userDataSet = dbService.load(userId,UserDataSet.class);
+        UserDataSet userDataSet = dbService.load(userId, UserDataSet.class);
         dbService.getMS().sendMessage(new MessageFindUserResponse(getTo(), getFrom(), userDataSet.getName(), context, socketId));
     }
 }

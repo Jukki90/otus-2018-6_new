@@ -1,13 +1,10 @@
 package ws;
 
 import front.FrontendService;
-import front.FrontendServiceImpl;
 import org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest;
 import org.eclipse.jetty.websocket.servlet.ServletUpgradeResponse;
 import org.eclipse.jetty.websocket.servlet.WebSocketCreator;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,7 +26,7 @@ public class WSCreator implements WebSocketCreator {
 
     @Override
     public Object createWebSocket(ServletUpgradeRequest req, ServletUpgradeResponse resp) {
-       FrontendService front = ApplicationContextProvider.getApplicationContext().getBean("frontendService", FrontendService.class);
+        FrontendService front = ApplicationContextProvider.getApplicationContext().getBean("frontendService", FrontendService.class);
         WSocket socket = new WSocket(front);
         log.info("WSocket created, socketId=" + socket.getSocketId());
         return socket;

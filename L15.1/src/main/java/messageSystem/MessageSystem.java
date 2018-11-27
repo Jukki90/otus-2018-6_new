@@ -31,8 +31,6 @@ public final class MessageSystem {
 
     public void addAddressee(Addressee addressee) {
         Address address = addressee.getAddress();
-//        LOG.info(String.format("Added Addressee %s with address %s", addressee, address));
-
         addresseeMap.put(address, addressee);
         messagesMap.put(address, new ConcurrentLinkedQueue<>());
 
@@ -42,7 +40,6 @@ public final class MessageSystem {
     public void sendMessage(Message message) {
         Address from = message.getFrom();
         Address to = message.getTo();
-      //  LOG.info("Send message " + message + " from " + from + " to " + to);
         messagesMap.get(to).add(message);
     }
 
@@ -50,12 +47,10 @@ public final class MessageSystem {
     private void startForAddressee(Addressee addressee) {
         new Thread(() -> {
             Address address = addressee.getAddress();
-           // LOG.info("Start Thread for Address " + address.getId().toString());
             while (true) {
                 ConcurrentLinkedQueue<Message> queue = messagesMap.get(address);
                 while (!queue.isEmpty()) {
                     Message message = queue.poll();
-                    //LOG.info("Start process Message " + message.toString());
                     message.exec(addressee);
                 }
                 pause();
