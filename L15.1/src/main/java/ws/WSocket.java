@@ -4,25 +4,26 @@ package ws;
 import base.UserDataSet;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
 import front.FrontendService;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.*;
-import ws.jsondata.CommandInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import ws.jsondata.CommandEnum;
+import ws.jsondata.JsonDataImpl;
 
 import java.io.IOException;
-import java.util.logging.Logger;
+import java.lang.reflect.Type;
 
 
 @WebSocket
 public class WSocket {
-    private static final Logger logger = Logger.getLogger(WSocket.class.getName());
-    public static final String GET_USER_BY_ID = "GET_USER_BY_ID";
-    public static final String GET_COUNT = "GET_COUNT";
-    public static final String CREATE_USER = "CREATE_USER";
+    private static Logger logger = LoggerFactory.getLogger(WSocket.class);
 
     private Session session;
     private String socketId;
-    FrontendService frontendService;
+    private FrontendService frontendService;
 
 
     public WSocket(FrontendService frontend) {
@@ -48,7 +49,7 @@ public class WSocket {
 
     @OnWebSocketError
     public void error(Session session, Throwable t) {
-        logger.info("ws error");
+        logger.error("ws error", t);
     }
 
 
@@ -56,18 +57,22 @@ public class WSocket {
     public void onMessage(Session session, String msg) {
         logger.info("Получено сообщение" + msg);
         this.session = session;
-        Gson g = new Gson();
-        CommandInfo commandInfo = null;
+        Gson gson = new Gson();
+        JsonDataImpl<UserDataSet> data = null;
         try {
-            commandInfo = g.fromJson(msg, CommandInfo.class);
+            Type userType = new TypeToken<JsonDataImpl<UserDataSet>>() {
+            }.getType();
+            data = gson.fromJson(msg, userType);
         } catch (JsonSyntaxException ex) {
+            logger.error("Возникла ошибка при парсинге запроса", ex);
             ex.printStackTrace();
         }
-        String method = commandInfo.getMethod();
-
+        CommandEnum method = data.getCommand();
+        logger.info("Выполняется метод: " + method);
         switch (method) {
             case GET_USER_BY_ID:
-                long userId = commandInfo.getUserId();
+                UserDataSet userData = (UserDataSet) data.getUserData();
+                long userId = userData.getId();
                 this.frontendService.getUserById(socketId, userId);
                 break;
             case GET_COUNT:
@@ -75,12 +80,11 @@ public class WSocket {
                 break;
 
             case CREATE_USER:
-                UserDataSet user = commandInfo.getUserData();
+                UserDataSet user = data.getUserData();
                 this.frontendService.save(socketId, user);
                 break;
             default:
-                logger.info("Не обрабатывается метод с таким праметром");
-
+                logger.error("Не обрабатывается метод с таким праметром");
         }
 
         logger.info("onMessage finished");
@@ -88,10 +92,14 @@ public class WSocket {
 
     public void sendMessage(String cacheParams) {
         try {
-            if (session.isOpen())
+            if (session.isOpen()) {
                 session.getRemote().sendString(cacheParams);
+            } else {
+                logger.info("Сессия закрыта!!!!");
+            }
         } catch (IOException e) {
-            logger.info(e.getMessage());
+            e.printStackTrace();
+            logger.error("Возникла ошибка ", e);
         }
     }
 

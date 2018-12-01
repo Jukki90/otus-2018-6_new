@@ -1,12 +1,12 @@
 package messageSystem;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.logging.LogManager;
-import java.util.logging.Logger;
 
 /**
  * @author tully
@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 
 @Component
 public final class MessageSystem {
-    private static final Logger LOG = LogManager.getLogManager().getLogger(MessageSystem.class.getName());
+    private static Logger logger = LoggerFactory.getLogger(MessageSystem.class);
     private static final int DEFAULT_STEP_TIME = 10;
     private final int stepTime;
 

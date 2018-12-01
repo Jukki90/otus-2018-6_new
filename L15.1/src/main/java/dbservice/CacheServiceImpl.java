@@ -3,18 +3,17 @@ package dbservice;
 import base.DataSet;
 import cache.CacheEngine;
 import cache.MyElement;
-import front.FrontendServiceImpl;
 import messageSystem.Address;
 import messageSystem.MessageSystem;
 import messageSystem.MessageSystemContext;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import java.util.logging.Logger;
 
 @Service
 public class CacheServiceImpl implements DBService {
-    private static final Logger logger = Logger.getLogger(FrontendServiceImpl.class.getName());
+    private static org.slf4j.Logger logger = LoggerFactory.getLogger(CacheServiceImpl.class);
     private Long counter = 0L;
 
     public CacheServiceImpl(MessageSystemContext context, Address address, CacheEngine cacheEngine) {
@@ -68,8 +67,10 @@ public class CacheServiceImpl implements DBService {
 
     @Override
     public long count() {
-        logger.info("Считаем кол-во элементов");
-        return cacheEngine.getSize();
+
+        long size = cacheEngine.getSize();
+        logger.info("Считаем кол-во элементов {}",size);
+        return size;
     }
 
     @Override

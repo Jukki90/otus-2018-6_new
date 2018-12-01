@@ -9,13 +9,15 @@ public interface FrontendService extends Addressee {
 
     void count(String socketId);
 
-    void returnNumberOfUsers(String result, String socketId);
+    void save(String socketId, UserDataSet user);
 
     void getUserById(String socketId, long id);
 
     void returnUserById(String result, String socketId);
 
-    void save(String socketId, UserDataSet user);
+    void returnNumberOfUsers(String result, String socketId);
+
+    void returnResultAfterSaving(String result, String socketId);
 
     WebSocketsHolder getWebSocketsHolder();
 

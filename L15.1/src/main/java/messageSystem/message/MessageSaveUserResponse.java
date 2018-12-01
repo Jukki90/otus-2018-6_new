@@ -5,11 +5,10 @@ import messageSystem.Address;
 import messageSystem.Addressee;
 import messageSystem.Message;
 import messageSystem.MessageSystemContext;
-
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MessageSaveUserResponse extends Message {
-    private static final Logger logger = Logger.getLogger(MessageFindUserResponse.class.getName());
+    private static org.slf4j.Logger logger = LoggerFactory.getLogger(MessageSaveUserResponse.class);
     private String result;
     private final MessageSystemContext context;
     private final String socketId;
@@ -27,11 +26,11 @@ public class MessageSaveUserResponse extends Message {
         if (addressee instanceof FrontendService) {
             exec((FrontendService) addressee);
         } else {
-            logger.info("Зарос андресован не к Фронту!");
+            logger.error("Зарос адресован не к Фронту!");
         }
     }
 
     public void exec(FrontendService frontendService) {
-        frontendService.returnNumberOfUsers(result, socketId);
+        frontendService.returnResultAfterSaving(result, socketId);
     }
 }

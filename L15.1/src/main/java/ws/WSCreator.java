@@ -1,27 +1,30 @@
 package ws;
 
 import front.FrontendService;
+import messageSystem.MessageSystem;
 import org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest;
 import org.eclipse.jetty.websocket.servlet.ServletUpgradeResponse;
 import org.eclipse.jetty.websocket.servlet.WebSocketCreator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Logger;
+
 
 /**
  * @author v.chibrikov
  */
 @Component
 public class WSCreator implements WebSocketCreator {
-    private final static Logger log = Logger.getLogger(WSCreator.class.getName());
+    private static Logger logger = LoggerFactory.getLogger(WSCreator.class);
     private Set<WSocket> users;
 
 
     public WSCreator() {
         this.users = ConcurrentHashMap.newKeySet();
-        log.info("WSCreator created");
+        logger.info("WSCreator created");
     }
 
     @Override

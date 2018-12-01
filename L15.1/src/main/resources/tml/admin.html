@@ -53,7 +53,9 @@ function getUserById() {
 
    var obj = new Object();
    obj.method = "GET_USER_BY_ID";
-   obj.id  = document.getElementById("userid").value;
+   var userData = new Object;
+   userData.id  = document.getElementById("userid").value;
+   obj.userData = userData;
    var jsonString= JSON.stringify(obj);
     ws.send(jsonString);
 };
@@ -81,6 +83,8 @@ function saveUser() {
     var jsonString= JSON.stringify(obj);
     ws.send(jsonString);
 };
+
+
 
     </SCRIPT>
 </head>

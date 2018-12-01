@@ -5,13 +5,11 @@ import messageSystem.Address;
 import messageSystem.Addressee;
 import messageSystem.Message;
 import messageSystem.MessageSystemContext;
-
-import java.util.logging.LogManager;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MessageGetCount extends Message {
-
-    private static final Logger logger = LogManager.getLogManager().getLogger(MessageGetCount.class.getName());
+    private static Logger logger = LoggerFactory.getLogger(MessageGetCount.class);
     private final MessageSystemContext context;
     private final String socketId;
 
@@ -26,7 +24,7 @@ public class MessageGetCount extends Message {
         if (addressee instanceof DBService) {
             exec((DBService) addressee);
         } else {
-            logger.info("Зарос андресован не к ДБ сервису!");
+            logger.error("Зарос андресован не к ДБ сервису!");
         }
     }
 

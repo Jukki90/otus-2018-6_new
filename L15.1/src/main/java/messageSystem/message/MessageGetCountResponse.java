@@ -6,12 +6,12 @@ import messageSystem.Address;
 import messageSystem.Addressee;
 import messageSystem.Message;
 import messageSystem.MessageSystemContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.logging.LogManager;
-import java.util.logging.Logger;
 
 public class MessageGetCountResponse extends Message {
-    private static final Logger logger = LogManager.getLogManager().getLogger(MessageGetCountResponse.class.getName());
+    private static Logger logger = LoggerFactory.getLogger(MessageGetCount.class);
 
     private String result;
     private final MessageSystemContext context;
@@ -30,7 +30,7 @@ public class MessageGetCountResponse extends Message {
         if (addressee instanceof FrontendService) {
             exec((FrontendService) addressee);
         } else {
-            logger.info("Зарос андресован не к Фронту!");
+            logger.error("Зарос андресован не к Фронту!");
         }
     }
 
