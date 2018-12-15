@@ -1,4 +1,4 @@
-package ws.jsondata;
+package jsondata;
 
 public enum CommandEnum {
     GET_USER_BY_ID,

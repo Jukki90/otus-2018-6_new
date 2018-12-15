@@ -10,8 +10,8 @@ import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ws.jsondata.CommandEnum;
-import ws.jsondata.JsonDataImpl;
+import jsondata.CommandEnum;
+import jsondata.JsonDataImpl;
 
 import java.io.IOException;
 import java.lang.reflect.Type;

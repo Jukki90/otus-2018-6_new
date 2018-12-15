@@ -3,6 +3,7 @@ package front;
 import base.UserDataSet;
 import channel.ManagedMsgSocketWorker;
 import messageSystem.Address;
+import messageSystem.message.Msg;
 import messageSystem.message.MsgCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,10 +22,9 @@ import java.util.concurrent.Executors;
 @Service
 public class FrontendServiceImpl implements FrontendService {
     private static final Logger logger = LoggerFactory.getLogger(FrontendServiceImpl.class);
-    // private final SocketClient socketClient;
     private static final int DELAY = 500;
     private volatile boolean isRegistered = false;
-    // private SocketClientChannel msClient;
+
 
     public void setAddress(Address address) {
         this.address = address;
@@ -37,42 +37,27 @@ public class FrontendServiceImpl implements FrontendService {
     private ManagedMsgSocketWorker msClient;
 
 
-    //private final MessageSystemContext context;
-
     public FrontendServiceImpl( Address address, WebSocketsHolder webSockets,ManagedMsgSocketWorker msClient) {
-        //this.context = context;
         this.address = address;
         this.webSockets = webSockets;
         this.msClient =msClient;
-        /*
-        ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(
-                "FrontSpringBeans.xml"); //get Spring context
-*/
-       // msClient = ctx.getBean("msClient", ManagedMsgSocketWorker.class);
+
         try {
+            logger.info("trying to start executors");
             start();
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        //  socketClient = new SocketClient();
-
-/*
-        try {
-            socketClient.initPool("localhost", 5050);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
-        //  init();// ??????
     }
 
-    public void start() throws Exception {
+    public void start()  {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.submit(() -> {
             try {
                 while (true) {
-                    Object msg = msClient.take();
+                    Msg msg = msClient.take();
                     System.out.println("Message received: " + msg.toString());
+                    returnStringResult(msg.getValue().toString(),msg.getWebSocketId() );
                 }
             } catch (InterruptedException e) {
                 logger.info(e.getMessage());
@@ -92,27 +77,11 @@ public class FrontendServiceImpl implements FrontendService {
         return address;
     }
 
-    /*
-    @Override
-    public MessageSystem getMS() {
-        return context.getMessageSystem();
-    }
-*/
+
     @Override
     public void count(String socketId) {
         logger.info("address from " + getAddress().getId());
-/*
-        try {
-            socketClient.doRequest("localhost", 5050, null);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
 
-        //  logger.info("address to " + context.getDbAddress().getId());
-        // Message message = new MessageGetCount(getAddress(), context.getDbAddress(), context, socketId);
-        //   context.getMessageSystem().sendMessage(message);
     }
 
     @Override
@@ -123,74 +92,9 @@ public class FrontendServiceImpl implements FrontendService {
 
 
 
-
-        /*
-        executorService.submit(() -> {
-            try {
-                // while (!isRegistered) {
-                logger.info("Sending registration message:  not registered yet");
-                msClient.send(new MsgCache(address, new Address("MsgServerService"), reqParam));
-                Thread.sleep(100);
-                //}
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                logger.info(e.getMessage());
-            }
-        });
-*/
-
-     /*   executorService.submit(() -> {
-            try {
-                while (!isRegistered) {*/
-
-
-        MsgCache request = new MsgCache(address, new Address("dbAddress"), reqParam);
+        MsgCache request = new MsgCache(address, new Address("dbAddress"), reqParam, socketId);
         logger.info("Send message to db service:  " + request.getType() + "   from:   " + request.getFrom().getId() + " to:   " + request.getTo().getId() + " value: " + request.getValue());
-        //msClient.send(new MsgRegister(address, new Address("MsgServerService")));
         msClient.send(request);
-                    /*
-                    Thread.sleep(DELAY);
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        });*/
-
-                    /*
-        executorService.submit(() -> {
-            try {
-                while (true) {
-                    logger.info("Attempt to take resp");
-                    Msg receivedMsg = msClient.take();
-                    logger.info("Received message:  " + receivedMsg.getType() + "   from:   " + receivedMsg.getFrom() + " to:   " + receivedMsg.getTo() + ", value: " + receivedMsg.getValue());
-                    if ((!isRegistered)) {
-                        logger.info("Receiving registration message answer:  not registered yet");
-                        logger.info("Received message:  " + receivedMsg.getType() + "   from:   " + receivedMsg.getFrom() + " to:   " + receivedMsg.getTo() + ", value: " + receivedMsg.getValue());
-                        logger.info("Registered on MsgServer successfully {}", receivedMsg);
-                        isRegistered = true;
-                    }
-
-                    Thread.sleep(DELAY);
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        });
-*/
-
-        //msClient.send(new MsgCache( new Address("frontAddress"), new Address("dbAddress"), reqParam));
-/*
-        try {
-            socketClient.doRequest("localhost", 5050, String.valueOf(id));
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
-
-        // logger.info("address to " + context.getDbAddress().getId());
-        // Message message = new MessageFindUser(getAddress(), context.getDbAddress(), context, socketId, id);
-        // context.getMessageSystem().sendMessage(message);
         logger.info("count finished - frontendServiceImpl");
     }
 

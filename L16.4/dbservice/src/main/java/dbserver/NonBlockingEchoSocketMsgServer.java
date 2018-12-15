@@ -1,5 +1,13 @@
 package dbserver;
 
+import base.UserDataSet;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import dbservice.CacheServiceImpl;
+import dbservice.DBService;
+import messageSystem.message.MsgCache;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -7,10 +15,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -20,7 +25,7 @@ import java.util.logging.Logger;
 /**
  * Created by tully.
  */
-public class NonBlockingEchoSocketMsgServer  {
+public class NonBlockingEchoSocketMsgServer {
     private static final Logger logger = Logger.getLogger(NonBlockingEchoSocketMsgServer.class.getName());
 
     private static final int THREADS_NUMBER = 1;
@@ -31,10 +36,17 @@ public class NonBlockingEchoSocketMsgServer  {
 
     private final ExecutorService executor;
     private final Map<String, ChannelMessages> channelMessages;
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+    Gson gson = new Gson();
+    DBService dbService;
 
     public NonBlockingEchoSocketMsgServer() {
         executor = Executors.newFixedThreadPool(THREADS_NUMBER);
         channelMessages = new ConcurrentHashMap<>();
+        ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("DBSpringBeans.xml"); //get Spring context
+
+        dbService = ctx.getBean("cacheService", CacheServiceImpl.class);
+
     }
 
     @SuppressWarnings("InfiniteLoopStatement")
@@ -103,15 +115,24 @@ public class NonBlockingEchoSocketMsgServer  {
                         try {
                             System.out.println("Echoing message to: " + entry.getKey());
                             ByteBuffer buffer = ByteBuffer.allocate(CAPACITY);
+                            //MsgCache msg = MAPPER.readValue(message.getBytes(), MsgCache.class);
 
-                            buffer.put(message.getBytes());
+                            MsgCache msg = gson.fromJson(message, MsgCache.class);
+                            long id = (long) Double.parseDouble((String.valueOf(msg.getValue().get("ID"))));
+                            System.out.println("Msg: " + msg.toString());
+                            UserDataSet user = dbService.load(id, UserDataSet.class);
+                            Map<String, Object> resMap = new HashMap<>();
+                            resMap.put("RESULT", user);
+                            MsgCache result = new MsgCache(msg.getTo(), msg.getFrom(), resMap, msg.getWebSocketId());
+                            System.out.println("Send result: " + resMap.toString());
+                            buffer.put(gson.toJson(result).getBytes());
                             buffer.put(MESSAGES_SEPARATOR.getBytes());
                             buffer.flip();
                             while (buffer.hasRemaining()) {
                                 channelMessages.channel.write(buffer);
                             }
                         } catch (IOException e) {
-                            logger.log(Level.SEVERE, e.getMessage());
+                            e.printStackTrace();
                         }
                     });
                     channelMessages.messages.clear();
@@ -121,6 +142,43 @@ public class NonBlockingEchoSocketMsgServer  {
         }
     }
 
+/*
+    private void sendMessage() {
+        try (PrintWriter writer = new PrintWriter(socket.getOutputStream(), true)) {
+            while (socket.isConnected()) {
+                final Msg msg = output.take(); //blocks
+                final String json = MAPPER.writeValueAsString(msg);
+                System.out.println("Sending message: " + json);
+                writer.println(json);
+                writer.println();//line with json + an empty line
+            }
+        } catch (InterruptedException | IOException e) {
+            logger.log(Level.SEVERE, e.getMessage());
+        }
+    }
+
+
+    private void receiveMessage() {
+        try (final BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
+            String inputLine;
+            StringBuilder stringBuilder = new StringBuilder();
+            while ((inputLine = reader.readLine()) != null) { //blocks
+                stringBuilder.append(inputLine);
+                if (inputLine.isEmpty()) { //empty line is the end of the message
+                    final String json = stringBuilder.toString();
+                    System.out.println("Receiving message: " + json);
+                    final Msg msg = MAPPER.readValue(json, Msg.class);
+                    input.add(msg);
+                    stringBuilder = new StringBuilder();
+                }
+            }
+        } catch (IOException e) {
+            logger.log(Level.SEVERE, e.getMessage());
+        } finally {
+            close();
+        }
+    }
+*/
 
     public boolean getRunning() {
         return true;

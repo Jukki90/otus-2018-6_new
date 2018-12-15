@@ -1,4 +1,4 @@
-package ws.jsondata;
+package jsondata;
 
 import java.io.Serializable;
 

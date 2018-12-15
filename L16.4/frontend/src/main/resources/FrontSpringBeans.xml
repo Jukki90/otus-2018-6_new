@@ -40,7 +40,7 @@
     <bean id="wsCreator" class="ws.WSCreator">
     </bean>
 
-    <bean id="applicationContextProvider" class="ws.ApplicationContextProvider"/>
+    <!--bean id="applicationContextProvider" class="ws.ApplicationContextProvider"/-->
 
     <context:annotation-config></context:annotation-config>
 

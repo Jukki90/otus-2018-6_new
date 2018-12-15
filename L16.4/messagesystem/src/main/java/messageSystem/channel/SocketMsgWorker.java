@@ -3,7 +3,9 @@ package messageSystem.channel;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import messageSystem.message.Msg;
+import messageSystem.message.MsgCache;
 import messageSystem.workers.MsgWorker;
 
 import java.io.BufferedReader;
@@ -36,6 +38,7 @@ public class SocketMsgWorker implements MsgWorker {
     protected final Socket socket;
     private final ExecutorService executor;
     private final List<Runnable> shutdownRegistrations;
+    Gson gson = new Gson();
 
     public SocketMsgWorker(Socket socket) {
         this.socket = socket;
@@ -102,7 +105,8 @@ public class SocketMsgWorker implements MsgWorker {
                 if (inputLine.isEmpty()) { //empty line is the end of the message
                     final String json = stringBuilder.toString();
                     System.out.println("Receiving message: " + json);
-                    final Msg msg = MAPPER.readValue(json, Msg.class);
+                    //final Msg msg = MAPPER.readValue(json, Msg.class);
+                    final Msg msg = gson.fromJson(json, MsgCache.class);
                     input.add(msg);
                     stringBuilder = new StringBuilder();
                 }

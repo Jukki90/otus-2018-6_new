@@ -14,12 +14,17 @@ public abstract class Msg {
     private MsgType type;
 
 
-    protected Msg(MsgType type, Class<?> clazz, Address from, Address to, Map<String, Object> value) {
+
+    private String webSocketId;
+
+
+    protected Msg(MsgType type, Class<?> clazz, Address from, Address to, Map<String, Object> value, String socketId) {
         this.className = clazz.getName();
         this.to = to;
         this.from = from;
         this.value = value;
         this.type = type;
+        this.webSocketId = socketId;
     }
 
     public Address getTo() {
@@ -41,4 +46,9 @@ public abstract class Msg {
     public MsgType getType() {
         return type;
     }
+
+    public String getWebSocketId() {
+        return webSocketId;
+    }
+
 }
