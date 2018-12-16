@@ -17,7 +17,6 @@ public class TemplateProcessor {
 
     public TemplateProcessor() throws IOException {
         configuration = new Configuration(Configuration.VERSION_2_3_28);
-        //configuration.setClassForTemplateLoading(this.getClass(), "/tml/");
         configuration.setClassForTemplateLoading(this.getClass(), "/tml/");
         configuration.setDefaultEncoding("UTF-8");
     }

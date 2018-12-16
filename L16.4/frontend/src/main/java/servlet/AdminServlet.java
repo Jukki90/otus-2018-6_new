@@ -34,41 +34,22 @@ public class AdminServlet extends HttpServlet {
     public static final String ADDRESS = "address";
     public static final String PHONE = "phone";
     public static final String IS_SHOWNUMBER = "shownumber";
-    //private SocketClientChannel client;
-   //FrontendServer frontendServer;
 
     @Autowired
     private TemplateProcessor templateProcessor;
 
-    /*
-    public DBService getDbService() {
-        return dbService;
-    }
-
-    public void setDbService(DBService dbService) {
-        this.dbService = dbService;
-    }
-
-    @Autowired
-    @Qualifier("cacheService")
-    public DBService dbService;*/
 
     Map<String, Object> pageVariables = new HashMap<>();
 
 
-
-    public AdminServlet(TemplateProcessor templateProcessor /*,DBService dbService*/){
-        //this.dbService=dbService;
-       // this.client=client;
-        this.templateProcessor=templateProcessor;
-        //this.frontendServer=frontendServer;
+    public AdminServlet(TemplateProcessor templateProcessor /*,DBService dbService*/) {
+        this.templateProcessor = templateProcessor;
     }
 
 
     @Override
     public void init() throws ServletException {
         super.init();
-       // SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
     }
 
 
@@ -78,16 +59,7 @@ public class AdminServlet extends HttpServlet {
         if (request.getParameter(USERID) != null) {
             int userid = Integer.parseInt(request.getParameter(USERID));
             Map<String, Object> params = new HashMap<>();
-            params.put("USERID",userid);
-            //client.send(new MsgCache(frontendServer.getFrontendAddress(), frontendServer.getDBServerAddress(), params));
-           // userDataSetResult = dbService.load(userid, UserDataSet.class);
-
-           /*
-            String value = "";
-            if (userDataSetResult != null) {
-                value = userDataSetResult.getName();
-            }*/
-           // pageVariables.put(RESULT, "Имя пользователя: " + frontendServer.getCacheMap().get(RESULT));
+            params.put("USERID", userid);
         }
 
 
@@ -97,7 +69,7 @@ public class AdminServlet extends HttpServlet {
 
         if (request.getParameter(IS_SHOWNUMBER) != null) {
 
-            pageVariables.put(RESULT, "Кол-во записей: ") ;/*+ dbService.count())*/
+            pageVariables.put(RESULT, "Кол-во записей: ");
         }
 
         response.setContentType("text/html;charset=utf-8");
@@ -122,10 +94,8 @@ public class AdminServlet extends HttpServlet {
         }
         UserDataSet userDataSetExpected = new UserDataSet(name, age, address, list);
         WebApplicationContext context = ContextLoader.getCurrentWebApplicationContext();
-        //dbService.save(userDataSetExpected);
         Map<String, Object> params = new HashMap<>();
-        params.put("USERDATASET",userDataSetExpected);
-       // client.send(new MsgCache(frontendServer.getFrontendAddress(), frontendServer.getDBServerAddress(), params));
+        params.put("USERDATASET", userDataSetExpected);
         pageVariables.put(RESULT, "Пользователь успешно добавлен!");
         response.setContentType("text/html;charset=utf-8");
         String page = templateProcessor.getPage(ADMIN_PAGE_TEMPLATE, pageVariables);

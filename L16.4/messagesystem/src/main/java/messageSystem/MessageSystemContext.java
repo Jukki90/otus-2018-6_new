@@ -2,9 +2,7 @@ package messageSystem;
 
 import org.springframework.stereotype.Component;
 
-/**
- * Created by tully.
- */
+
 @Component
 public class MessageSystemContext {
 

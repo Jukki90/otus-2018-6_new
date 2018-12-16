@@ -8,9 +8,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-/**
- * @author tully
- */
 
 @Component
 public final class MessageSystem {

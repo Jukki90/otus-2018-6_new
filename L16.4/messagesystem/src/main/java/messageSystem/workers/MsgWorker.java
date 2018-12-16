@@ -4,9 +4,7 @@ import messageSystem.message.Msg;
 
 import java.io.Closeable;
 
-/**
- * Created by tully.
- */
+
 public interface MsgWorker extends Closeable {
     void send(Msg msg);
 

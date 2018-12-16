@@ -15,7 +15,6 @@
             <groupId>ru.otus</groupId>
             <artifactId>messagesystem</artifactId>
             <version>1.0-SNAPSHOT</version>
-            <!--scope>compile</scope-->
             <scope>system</scope>
             <systemPath>${basedir}/../messagesystem/target/messagesystem.jar</systemPath>
         </dependency>

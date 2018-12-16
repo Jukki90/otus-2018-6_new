@@ -23,9 +23,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-/**
- * Created by tully.
- */
 public class NonBlockingEchoSocketMsgServer {
     private static org.slf4j.Logger logger = LoggerFactory.getLogger(NonBlockingEchoSocketMsgServer.class);
     private static final int THREADS_NUMBER = 1;
@@ -146,9 +143,14 @@ public class NonBlockingEchoSocketMsgServer {
             Map<String, Object> resMap = new HashMap<>();
             switch (method) {
                 case "GET_USER_ID":
-                    long id = jsonNode.get("METHOD").asLong();
+                    long id = jsonNode.get("ID").asLong();
                     UserDataSet user = dbService.load(id, UserDataSet.class);
-                    resMap.put("RESULT", user);
+                    if(user!=null) {
+                        resMap.put("RESULT", user.getName());
+                    }
+                    else{
+                        resMap.put("RESULT", "Пользователь не найден!");
+                    }
                     break;
                 case "SAVE":
                     String userStr = jsonNode.get("USER").toString();

@@ -23,9 +23,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
-/**
- * Created by tully.
- */
 public class SocketMsgWorker implements MsgWorker {
     private static final Logger logger = Logger.getLogger(SocketMsgWorker.class.getName());
     private static final int WORKERS_COUNT = 2;
@@ -105,7 +102,6 @@ public class SocketMsgWorker implements MsgWorker {
                 if (inputLine.isEmpty()) { //empty line is the end of the message
                     final String json = stringBuilder.toString();
                     System.out.println("Receiving message: " + json);
-                    //final Msg msg = MAPPER.readValue(json, Msg.class);
                     final Msg msg = gson.fromJson(json, MsgCache.class);
                     input.add(msg);
                     stringBuilder = new StringBuilder();
