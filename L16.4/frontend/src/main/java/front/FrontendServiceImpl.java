@@ -23,6 +23,7 @@ import java.util.concurrent.Executors;
 public class FrontendServiceImpl implements FrontendService {
     private static final Logger logger = LoggerFactory.getLogger(FrontendServiceImpl.class);
     private static final int DELAY = 500;
+    public static final String METHOD = "METHOD";
     private volatile boolean isRegistered = false;
 
 
@@ -37,11 +38,10 @@ public class FrontendServiceImpl implements FrontendService {
     private ManagedMsgSocketWorker msClient;
 
 
-    public FrontendServiceImpl( Address address, WebSocketsHolder webSockets,ManagedMsgSocketWorker msClient) {
+    public FrontendServiceImpl(Address address, WebSocketsHolder webSockets, ManagedMsgSocketWorker msClient) {
         this.address = address;
         this.webSockets = webSockets;
-        this.msClient =msClient;
-
+        this.msClient = msClient;
         try {
             logger.info("trying to start executors");
             start();
@@ -50,14 +50,14 @@ public class FrontendServiceImpl implements FrontendService {
         }
     }
 
-    public void start()  {
+    public void start() {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.submit(() -> {
             try {
                 while (true) {
                     Msg msg = msClient.take();
                     System.out.println("Message received: " + msg.toString());
-                    returnStringResult(msg.getValue().toString(),msg.getWebSocketId() );
+                    returnStringResult(msg.getValue().toString(), msg.getWebSocketId());
                 }
             } catch (InterruptedException e) {
                 logger.info(e.getMessage());
@@ -71,7 +71,6 @@ public class FrontendServiceImpl implements FrontendService {
     }
 
 
-
     @Override
     public Address getAddress() {
         return address;
@@ -81,6 +80,11 @@ public class FrontendServiceImpl implements FrontendService {
     @Override
     public void count(String socketId) {
         logger.info("address from " + getAddress().getId());
+        Map<String, Object> reqParam = new HashMap<>();
+        reqParam.put(METHOD, "COUNT");
+        MsgCache request = new MsgCache(address, new Address("dbAddress"), reqParam, socketId);
+        logger.info("Send message to db service:  " + request.getType() + "   from:   " + request.getFrom().getId() + " to:   " + request.getTo().getId() + " value: " + request.getValue());
+        msClient.send(request);
 
     }
 
@@ -88,14 +92,23 @@ public class FrontendServiceImpl implements FrontendService {
     public void getUserById(String socketId, long id) {
         logger.info("address from " + getAddress().getId());
         Map<String, Object> reqParam = new HashMap<>();
+        reqParam.put(METHOD, "GET_USER_ID");
         reqParam.put("ID", id);
-
-
-
         MsgCache request = new MsgCache(address, new Address("dbAddress"), reqParam, socketId);
         logger.info("Send message to db service:  " + request.getType() + "   from:   " + request.getFrom().getId() + " to:   " + request.getTo().getId() + " value: " + request.getValue());
         msClient.send(request);
-        logger.info("count finished - frontendServiceImpl");
+    }
+
+
+    @Override
+    public void save(String socketId, UserDataSet user) {
+        logger.info("address from " + getAddress().getId());
+        Map<String, Object> reqParam = new HashMap<>();
+        reqParam.put(METHOD, "SAVE");
+        reqParam.put("USER", user);
+        MsgCache request = new MsgCache(address, new Address("dbAddress"), reqParam, socketId);
+        logger.info("Send message to db service:  " + request.getType() + "   from:   " + request.getFrom().getId() + " to:   " + request.getTo().getId() + " value: " + request.getValue());
+        msClient.send(request);
     }
 
     @Override
@@ -126,13 +139,6 @@ public class FrontendServiceImpl implements FrontendService {
         }
     }
 
-    @Override
-    public void save(String socketId, UserDataSet user) {
-        logger.info("address from " + getAddress().getId());
-        // logger.info("address to " + context.getDbAddress().getId());
-        //Message message = new MessageSaveUser(getAddress(), context.getDbAddress(), context, socketId, user);
-        // context.getMessageSystem().sendMessage(message);
-    }
 
     public WebSocketsHolder getWebSocketsHolder() {
         return webSockets;

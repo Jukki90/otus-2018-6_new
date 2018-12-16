@@ -1,11 +1,14 @@
 package dbserver;
 
 import base.UserDataSet;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import dbservice.CacheServiceImpl;
 import dbservice.DBService;
+import messageSystem.Address;
 import messageSystem.message.MsgCache;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.io.IOException;
@@ -19,15 +22,12 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Created by tully.
  */
 public class NonBlockingEchoSocketMsgServer {
-    private static final Logger logger = Logger.getLogger(NonBlockingEchoSocketMsgServer.class.getName());
-
+    private static org.slf4j.Logger logger = LoggerFactory.getLogger(NonBlockingEchoSocketMsgServer.class);
     private static final int THREADS_NUMBER = 1;
     private static final int PORT = 5050;
     private static final int ECHO_DELAY = 100;
@@ -38,6 +38,9 @@ public class NonBlockingEchoSocketMsgServer {
     private final Map<String, ChannelMessages> channelMessages;
     private static final ObjectMapper MAPPER = new ObjectMapper();
     Gson gson = new Gson();
+    ObjectMapper objectMapper = new ObjectMapper();
+
+
     DBService dbService;
 
     public NonBlockingEchoSocketMsgServer() {
@@ -96,7 +99,7 @@ public class NonBlockingEchoSocketMsgServer {
                             }
                         }
                     } catch (IOException e) {
-                        logger.log(Level.SEVERE, e.getMessage());
+                        logger.error(e.getMessage());
                     } finally {
                         iterator.remove();
                     }
@@ -115,16 +118,8 @@ public class NonBlockingEchoSocketMsgServer {
                         try {
                             System.out.println("Echoing message to: " + entry.getKey());
                             ByteBuffer buffer = ByteBuffer.allocate(CAPACITY);
-                            //MsgCache msg = MAPPER.readValue(message.getBytes(), MsgCache.class);
 
-                            MsgCache msg = gson.fromJson(message, MsgCache.class);
-                            long id = (long) Double.parseDouble((String.valueOf(msg.getValue().get("ID"))));
-                            System.out.println("Msg: " + msg.toString());
-                            UserDataSet user = dbService.load(id, UserDataSet.class);
-                            Map<String, Object> resMap = new HashMap<>();
-                            resMap.put("RESULT", user);
-                            MsgCache result = new MsgCache(msg.getTo(), msg.getFrom(), resMap, msg.getWebSocketId());
-                            System.out.println("Send result: " + resMap.toString());
+                            MsgCache result = getDBResult(message);
                             buffer.put(gson.toJson(result).getBytes());
                             buffer.put(MESSAGES_SEPARATOR.getBytes());
                             buffer.flip();
@@ -142,43 +137,44 @@ public class NonBlockingEchoSocketMsgServer {
         }
     }
 
-/*
-    private void sendMessage() {
-        try (PrintWriter writer = new PrintWriter(socket.getOutputStream(), true)) {
-            while (socket.isConnected()) {
-                final Msg msg = output.take(); //blocks
-                final String json = MAPPER.writeValueAsString(msg);
-                System.out.println("Sending message: " + json);
-                writer.println(json);
-                writer.println();//line with json + an empty line
-            }
-        } catch (InterruptedException | IOException e) {
-            logger.log(Level.SEVERE, e.getMessage());
-        }
-    }
+    private MsgCache getDBResult(String message) {
+        logger.info("Пытаемся обработать запрос");
+        try {
+            JsonNode jsonNodeWrapper = objectMapper.readTree(message);
+            JsonNode jsonNode = jsonNodeWrapper.get("value");
+            String method = jsonNode.get("METHOD").asText();
+            Map<String, Object> resMap = new HashMap<>();
+            switch (method) {
+                case "GET_USER_ID":
+                    long id = jsonNode.get("METHOD").asLong();
+                    UserDataSet user = dbService.load(id, UserDataSet.class);
+                    resMap.put("RESULT", user);
+                    break;
+                case "SAVE":
+                    String userStr = jsonNode.get("USER").toString();
+                    UserDataSet usr = objectMapper.readValue(userStr, UserDataSet.class);
+                    dbService.save(usr);
+                    resMap.put("RESULT", "SUCCESS");
+                    break;
+                case "COUNT":
+                    resMap.put("RESULT", dbService.count());
+                    break;
 
-
-    private void receiveMessage() {
-        try (final BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
-            String inputLine;
-            StringBuilder stringBuilder = new StringBuilder();
-            while ((inputLine = reader.readLine()) != null) { //blocks
-                stringBuilder.append(inputLine);
-                if (inputLine.isEmpty()) { //empty line is the end of the message
-                    final String json = stringBuilder.toString();
-                    System.out.println("Receiving message: " + json);
-                    final Msg msg = MAPPER.readValue(json, Msg.class);
-                    input.add(msg);
-                    stringBuilder = new StringBuilder();
-                }
+                default:
+                    logger.error("Метод не реализован!");
             }
+            Address from = new Address("dbAddress");
+            Address to = new Address("Frontend");
+            String wsId = jsonNodeWrapper.get("webSocketId").asText();
+            MsgCache result = new MsgCache(from, to, resMap, wsId);
+            System.out.println("Send result: " + resMap.toString());
+            return result;
         } catch (IOException e) {
-            logger.log(Level.SEVERE, e.getMessage());
-        } finally {
-            close();
+            e.printStackTrace();
         }
+        return null;
     }
-*/
+
 
     public boolean getRunning() {
         return true;
