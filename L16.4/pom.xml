@@ -22,7 +22,7 @@
         <mysql-connector-java.version>8.0.12</mysql-connector-java.version>
         <hibernate-core.version>5.3.6.Final</hibernate-core.version>
         <jaxb.version>2.3.0</jaxb.version>
-        <jetty.version>9.4.11.v20180605</jetty.version>
+        <jetty.version>9.4.24.v20191120</jetty.version>
         <freemarker.version>2.3.28</freemarker.version>
         <spring.version>5.1.2.RELEASE</spring.version>
     </properties>
