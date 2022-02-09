@@ -15,7 +15,7 @@
         <maven.compiler.source>1.10</maven.compiler.source>
         <maven.compiler.target>1.10</maven.compiler.target>
         <mysql-connector-java.version>8.0.12</mysql-connector-java.version>
-        <hibernate-core.version>5.3.6.Final</hibernate-core.version>
+        <hibernate-core.version>5.4.24.Final</hibernate-core.version>
         <jaxb.version>2.3.0</jaxb.version>
         <jetty.version>9.4.12.v20180830</jetty.version>
         <freemarker.version>2.3.28</freemarker.version>
